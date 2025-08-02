@@ -47,6 +47,56 @@
 - **Framework:** Next.js 15 (App Router) - Modern React framework with excellent performance, SSR capabilities, and Server Actions for seamless client-server integration
 - **Documentation:** https://nextjs.org/docs
 
+### Server Actions Architecture:
+
+- **Colocation Pattern:** Server Actions must be colocated with the pages that use them
+- **File Structure:** Each page requiring actions should have its own `actions.ts` file in the same directory
+- **Example Structure:**
+  ```
+  app/
+  ├── auth/
+  │   ├── login/
+  │   │   ├── page.tsx
+  │   │   └── actions.ts        # Login-specific actions
+  │   └── register/
+  │       ├── page.tsx
+  │       └── actions.ts        # Registration-specific actions
+  ├── dashboard/
+  │   ├── page.tsx
+  │   └── actions.ts            # Dashboard-specific actions
+  └── routines/
+      ├── page.tsx
+      └── actions.ts            # Routine-specific actions
+  ```
+- **Benefits:** Better code organization, clearer dependencies, easier maintenance, and improved developer experience
+
+### Error Handling Pattern:
+
+- **Go-Style Error Handling:** Use tuple-based error handling pattern `[error, data]` for cleaner code
+- **Utility Functions:**
+  - `to(promise)` - Wraps async operations and returns `[error, data]` tuple
+  - `toSync(fn)` - Wraps synchronous operations that might throw
+- **Example Usage:**
+
+  ```typescript
+  import { to, toSync } from '@/lib/utils/error-handler';
+
+  // Async operations
+  const [error, user] = await to(auth.api.signInEmail(data));
+  if (error) {
+    return { error: error.message };
+  }
+  // user is safely available here
+
+  // Synchronous operations (validation, parsing)
+  const [validationError, validatedData] = toSync(() => schema.parse(data));
+  if (validationError) {
+    return { error: 'Invalid data' };
+  }
+  ```
+
+- **Benefits:** Eliminates nested try-catch blocks, makes error handling explicit, reduces cognitive load
+
 ### Language:
 
 - **Language:** TypeScript - Type safety, better developer experience, and excellent tooling support
@@ -112,7 +162,7 @@
 - [x] Set up TanStack Query with proper SSR configuration
 - [x] Create basic project structure and core utilities
 - [x] Set up database schema and initial migrations
-- [ ] Implement basic authentication flows (signup/signin/signout)
+- [x] Implement basic authentication flows (signup/signin/signout)
 
 ### Stage 2: Core Authentication & User Management
 

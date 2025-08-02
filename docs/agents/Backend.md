@@ -38,6 +38,150 @@ You will write code in:
 - **TypeScript** with strict mode for type safety
 - **Next.js Server Actions** for server-side logic and mutations
 
+## 🔐 Server-Side Authentication Implementation
+
+**CRITICAL**: Authentication must always be handled server-side using Server Actions, never on the client.
+
+### Server Actions Colocation Pattern
+
+Server Actions must be colocated with pages following Next.js 15 App Router best practices:
+
+```
+app/
+├── auth/login/
+│   ├── page.tsx
+│   └── actions.ts     # Login-specific actions
+├── auth/register/
+│   ├── page.tsx
+│   └── actions.ts     # Registration actions
+└── dashboard/
+    ├── page.tsx
+    └── actions.ts     # Dashboard actions (logout, etc.)
+```
+
+### Go-Style Error Handling for Server Actions
+
+Implement Go-style tuple error handling for cleaner, more maintainable code:
+
+```typescript
+// lib/utils/error-handler.ts - Error handling utilities
+export async function to<T, E = Error>(
+  promise: Promise<T>
+): Promise<[E | null, T | null]> {
+  try {
+    const data = await promise;
+    return [null, data];
+  } catch (error) {
+    return [error as E, null];
+  }
+}
+
+export function toSync<T, E = Error>(fn: () => T): [E | null, T | null] {
+  try {
+    const data = fn();
+    return [null, data];
+  } catch (error) {
+    return [error as E, null];
+  }
+}
+```
+
+### BetterAuth Server Actions Pattern
+
+```typescript
+// app/auth/login/actions.ts - Server Action colocated with login page
+'use server';
+
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { z } from 'zod';
+import { auth } from '@/lib/auth/auth';
+import { to, toSync } from '@/lib/utils/error-handler';
+
+export async function loginAction(prevState: any, formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  // Validate form data using Go-style error handling
+  const [validationError, validatedData] = toSync(() =>
+    loginSchema.parse({ email, password })
+  );
+
+  if (validationError) {
+    if (validationError instanceof z.ZodError) {
+      return {
+        error: validationError.issues[0]?.message || 'Invalid form data',
+        fieldErrors: validationError.flatten().fieldErrors,
+      };
+    }
+    return { error: 'Invalid form data' };
+  }
+
+  // Server-side authentication with BetterAuth using Go-style error handling
+  const [authError, result] = await to(
+    auth.api.signInEmail({
+      body: validatedData,
+      headers: await headers(),
+    })
+  );
+
+  if (authError) {
+    console.error('Authentication error:', authError);
+    return { error: authError.message || 'Authentication failed' };
+  }
+
+  if (!result?.user) {
+    return { error: 'Invalid credentials' };
+  }
+
+  // Redirect directly in server action
+  redirect('/dashboard');
+}
+
+export async function logoutAction() {
+  try {
+    await auth.api.signOut({ headers: await headers() });
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+  redirect('/auth/login');
+}
+
+// Authentication utilities for server components
+export async function requireAuth() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    redirect('/auth/login');
+  }
+  return session;
+}
+```
+
+### Protected Route Middleware
+
+```typescript
+// middleware.ts - Server-side route protection
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { auth } from '@/lib/auth/auth';
+
+export async function middleware(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
+
+  const protectedRoutes = ['/dashboard', '/routines', '/workout'];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isProtectedRoute && !session) {
+    const loginUrl = new URL('/auth/login', request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
+```
+
 ## 🗾 Backend Implementation Guidelines
 
 ### Drizzle ORM Schema Design

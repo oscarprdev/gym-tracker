@@ -5,15 +5,15 @@ import { db } from '@/lib/db/client';
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
-    usePlural: true, // Since our tables use plural names (users, exercises, etc.)
+    usePlural: true,
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // We'll enable this later after email setup
+    requireEmailVerification: false,
   },
   session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day (update session every day)
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
   },
   trustedOrigins: [process.env.BETTER_AUTH_URL!],
 });

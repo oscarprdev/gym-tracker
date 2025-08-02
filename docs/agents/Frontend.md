@@ -38,6 +38,127 @@ You will write code in:
 - **Shadcn/ui** for component primitives
 - **TanStack Query** for server state management
 
+## 🔐 Server-Side Authentication Pattern
+
+**CRITICAL**: Always use Server Actions for authentication, never handle auth on the client side.
+
+### Colocation Pattern for Server Actions
+
+Server Actions must be colocated with the pages that use them following this structure:
+
+```
+app/
+├── auth/login/
+│   ├── page.tsx
+│   └── actions.ts     # Login-specific actions
+├── auth/register/
+│   ├── page.tsx
+│   └── actions.ts     # Registration actions
+└── dashboard/
+    ├── page.tsx
+    └── actions.ts     # Dashboard actions
+```
+
+### Go-Style Error Handling Pattern
+
+Use tuple-based error handling for cleaner, more readable code:
+
+```typescript
+// lib/utils/error-handler.ts - Go-style error handling utilities
+export async function to<T, E = Error>(
+  promise: Promise<T>
+): Promise<[E | null, T | null]> {
+  try {
+    const data = await promise;
+    return [null, data];
+  } catch (error) {
+    return [error as E, null];
+  }
+}
+
+export function toSync<T, E = Error>(fn: () => T): [E | null, T | null] {
+  try {
+    const data = fn();
+    return [null, data];
+  } catch (error) {
+    return [error as E, null];
+  }
+}
+```
+
+### Authentication Forms with Server Actions
+
+```typescript
+// app/auth/login/actions.ts - Server Action colocated with login page
+'use server';
+
+import { z } from 'zod';
+import { auth } from '@/lib/auth/auth';
+import { headers } from 'next/headers';
+import { to, toSync } from '@/lib/utils/error-handler';
+
+export async function loginAction(prevState: any, formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  // Validate using Go-style error handling
+  const [validationError, validatedData] = toSync(() =>
+    loginSchema.parse({ email, password })
+  );
+
+  if (validationError) {
+    return {
+      error: validationError.issues[0]?.message || 'Invalid form data',
+      fieldErrors: validationError.flatten().fieldErrors
+    };
+  }
+
+  // Authenticate using Go-style error handling
+  const [authError, result] = await to(
+    auth.api.signInEmail({
+      body: validatedData,
+      headers: await headers(),
+    })
+  );
+
+  if (authError) {
+    return { error: authError.message || 'Authentication failed' };
+  }
+
+  if (!result?.user) {
+    return { error: 'Invalid credentials' };
+  }
+
+  // Redirect directly in server action
+  redirect('/dashboard');
+}
+
+// components/auth/login-form.tsx - Client Component using Server Action
+'use client';
+
+import { useActionState } from 'react';
+import { loginAction } from '@/app/auth/login/actions';
+
+export function LoginForm() {
+  const [state, formAction, isPending] = useActionState(loginAction, null);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      {state?.error && (
+        <div className="text-red-600">{state.error}</div>
+      )}
+
+      <input name="email" type="email" required disabled={isPending} />
+      <input name="password" type="password" required disabled={isPending} />
+
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Signing in...' : 'Sign in'}
+      </button>
+    </form>
+  );
+}
+```
+
 ## 🗾 Frontend Implementation Guidelines
 
 ### React 19 Modern Patterns

@@ -37,6 +37,177 @@ You will write code across the entire stack:
 - **Backend**: Drizzle ORM + Supabase + BetterAuth + TypeScript
 - **Integration**: Next.js Server Actions, API routes, real-time subscriptions
 
+## 🔐 Server-Side Authentication Architecture
+
+**CRITICAL**: Authentication must always be handled server-side using Server Actions for security and performance.
+
+### Server Actions Colocation Architecture
+
+Server Actions must be colocated with pages for better organization and maintainability:
+
+```
+app/
+├── auth/login/
+│   ├── page.tsx        # Login page component
+│   └── actions.ts      # Login server actions
+├── auth/register/
+│   ├── page.tsx        # Registration page
+│   └── actions.ts      # Registration actions
+├── dashboard/
+│   ├── page.tsx        # Dashboard page
+│   └── actions.ts      # Dashboard actions (logout)
+└── routines/
+    ├── page.tsx        # Routines page
+    └── actions.ts      # Routine CRUD actions
+```
+
+### Go-Style Error Handling Integration
+
+Implement clean error handling across the full stack:
+
+```typescript
+// lib/utils/error-handler.ts - Shared error handling utilities
+export async function to<T, E = Error>(
+  promise: Promise<T>
+): Promise<[E | null, T | null]> {
+  try {
+    const data = await promise;
+    return [null, data];
+  } catch (error) {
+    return [error as E, null];
+  }
+}
+
+export function toSync<T, E = Error>(fn: () => T): [E | null, T | null] {
+  try {
+    const data = fn();
+    return [null, data];
+  } catch (error) {
+    return [error as E, null];
+  }
+}
+```
+
+### Complete Authentication Flow
+
+```typescript
+// app/auth/login/actions.ts - Server Action colocated with login page
+'use server';
+
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { z } from 'zod';
+import { auth } from '@/lib/auth/auth';
+import { to, toSync } from '@/lib/utils/error-handler';
+
+export async function loginAction(prevState: any, formData: FormData) {
+  // Validate form data using Go-style error handling
+  const [validationError, validatedData] = toSync(() =>
+    loginSchema.parse({
+      email: formData.get('email'),
+      password: formData.get('password'),
+    })
+  );
+
+  if (validationError) {
+    return {
+      error: validationError.issues[0]?.message || 'Invalid form data',
+      fieldErrors: validationError.flatten().fieldErrors,
+    };
+  }
+
+  // Authenticate using Go-style error handling
+  const [authError, result] = await to(
+    auth.api.signInEmail({
+      body: validatedData,
+      headers: await headers(),
+    })
+  );
+
+  if (authError) {
+    return { error: authError.message || 'Authentication failed' };
+  }
+
+  if (!result?.user) {
+    return { error: 'Invalid credentials' };
+  }
+
+  // Redirect directly in server action
+  redirect('/dashboard');
+}
+
+// components/auth/login-form.tsx - Client form using Server Action
+'use client';
+
+import { useActionState } from 'react';
+import { loginAction } from '@/app/auth/login/actions';
+
+export function LoginForm() {
+  const [state, formAction, isPending] = useActionState(loginAction, null);
+
+  return (
+    <form action={formAction}>
+      <input name="email" type="email" required disabled={isPending} />
+      <input name="password" type="password" required disabled={isPending} />
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Signing in...' : 'Sign in'}
+      </button>
+      {state?.error && <p className="text-red-600">{state.error}</p>}
+    </form>
+  );
+}
+
+// app/dashboard/page.tsx - Protected server component
+import { requireAuth } from '@/lib/auth/utils';
+
+export default async function DashboardPage() {
+  const session = await requireAuth(); // Redirects if not authenticated
+
+  return (
+    <div>
+      <h1>Welcome, {session.user.name}!</h1>
+      {/* Dashboard content */}
+    </div>
+  );
+}
+```
+
+### Authentication Middleware Integration
+
+```typescript
+// middleware.ts - Full-stack route protection
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { auth } from '@/lib/auth/auth';
+
+export async function middleware(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
+
+  // Define route protection patterns
+  const protectedRoutes = ['/dashboard', '/routines', '/workout'];
+  const authRoutes = ['/auth/login', '/auth/register'];
+
+  const isProtected = protectedRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  const isAuthRoute = authRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  // Redirect logic
+  if (isProtected && !session) {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+
+  if (isAuthRoute && session) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  return NextResponse.next();
+}
+```
+
 ## 🗾 Full-stack Implementation Guidelines
 
 ### End-to-End Type Safety
