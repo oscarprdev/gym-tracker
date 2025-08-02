@@ -171,7 +171,7 @@
 
 #### Sub-steps:
 
-- [ ] Implement user registration with email verification
+- [ ] Implement user registration
 - [ ] Set up protected routes and authentication middleware
 - [ ] Create user profile management functionality
 - [ ] Implement password reset and change password flows

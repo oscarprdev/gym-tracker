@@ -1,17 +1,11 @@
 'use client';
 
-import { useSession, useUser } from '@/lib/auth/auth-client';
+import { useSession } from '@/lib/auth/auth-client';
 
 export function useAuth() {
-  const {
-    data: session,
-    isPending: sessionLoading,
-    error: sessionError,
-  } = useSession();
-  const { data: user, isPending: userLoading, error: userError } = useUser();
+  const { data: session, isPending: isLoading, error } = useSession();
 
-  const isLoading = sessionLoading || userLoading;
-  const error = sessionError || userError;
+  const user = session?.user;
   const isAuthenticated = !!session && !!user;
 
   return {

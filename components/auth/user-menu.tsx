@@ -44,9 +44,11 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200"
+          className="relative h-10 w-10 rounded-full bg-secondary hover:bg-accent transition-colors duration-200"
         >
-          <span className="text-sm font-medium text-gray-700">{initials}</span>
+          <span className="text-sm font-medium text-secondary-foreground">
+            {initials}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -75,7 +77,7 @@ export function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="cursor-pointer text-red-600 focus:text-red-600"
+          className="cursor-pointer text-destructive focus:text-destructive"
           onClick={handleSignOut}
           disabled={isPending}
         >

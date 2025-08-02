@@ -14,7 +14,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       {state?.error && (
-        <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+        <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
           {state.error}
         </div>
       )}
@@ -30,7 +30,9 @@ export function LoginForm() {
           required
         />
         {state?.fieldErrors?.email?.[0] && (
-          <p className="text-sm text-red-600">{state.fieldErrors.email[0]}</p>
+          <p className="text-sm text-destructive">
+            {state.fieldErrors.email[0]}
+          </p>
         )}
       </div>
 
@@ -64,7 +66,7 @@ export function LoginForm() {
           </Button>
         </div>
         {state?.fieldErrors?.password?.[0] && (
-          <p className="text-sm text-red-600">
+          <p className="text-sm text-destructive">
             {state.fieldErrors.password[0]}
           </p>
         )}

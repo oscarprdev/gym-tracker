@@ -17,8 +17,8 @@ export function useAuthUser() {
   return useQuery({
     queryKey: ['auth', 'user'],
     queryFn: async () => {
-      const user = await authClient.getUser();
-      return user;
+      const { data: session } = await authClient.getSession();
+      return session?.user || null;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

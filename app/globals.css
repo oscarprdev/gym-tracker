@@ -1,22 +1,87 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Trade Republic inspired dark theme */
+  /* Base colors - Very dark backgrounds like TR */
+  --background: #0a0a0a; /* Almost black background */
+  --foreground: #ffffff; /* Pure white text for contrast */
+
+  /* Primary colors - Trade Republic's signature blue accent */
+  --primary: #649ff0; /* TR's blue accent color */
+  --primary-foreground: #000000; /* Black text on blue */
+
+  /* Secondary colors - Dark grays */
+  --secondary: #1a1a1a; /* Dark gray for cards */
+  --secondary-foreground: #ffffff; /* White text on dark */
+
+  /* Muted colors - Subtle grays for less important content */
+  --muted: #262626; /* Slightly lighter dark gray */
+  --muted-foreground: #a0a0a0; /* Light gray text */
+
+  /* Accent colors - Hover states and interactive elements */
+  --accent: #1a1a1a; /* Same as secondary for consistency */
+  --accent-foreground: #ffffff; /* White text */
+
+  /* Success colors - Trade Republic's profit green */
+  --success: #79ea86; /* TR's profit green */
+  --success-foreground: #000000; /* Black text on green */
+
+  /* Destructive colors - Trade Republic's loss red */
+  --destructive: #e75757; /* TR's loss red */
+  --destructive-foreground: #ffffff; /* White text on red */
+
+  /* Border colors - Very subtle borders */
+  --border: #333333; /* Dark gray borders */
+  --input: #262626; /* Same as muted background */
+
+  /* Ring colors for focus states */
+  --ring: #649ff0; /* Same as primary blue */
+
+  /* Card colors - Slightly elevated from background */
+  --card: #1a1a1a; /* Dark card background */
+  --card-foreground: #ffffff; /* White text on cards */
+
+  /* Popover colors */
+  --popover: #1a1a1a; /* Dark popover background */
+  --popover-foreground: #ffffff; /* White text on popovers */
+
+  /* Warning colors - Trade Republic's yellow/amber */
+  --warning: #eff066; /* TR's warning yellow */
+  --warning-foreground: #000000; /* Black text on yellow */
+
+  /* Info colors - Purple accent */
+  --info: #d49ef2; /* TR's purple accent */
+  --info-foreground: #000000; /* Black text on purple */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

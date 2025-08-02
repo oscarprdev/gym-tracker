@@ -8,6 +8,13 @@
       "when": 1754122583812,
       "tag": "0000_tricky_nick_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1754125626797,
+      "tag": "0001_thankful_cobalt_man",
+      "breakpoints": true
     }
   ]
 }

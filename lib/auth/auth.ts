@@ -1,11 +1,22 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/lib/db/client';
+import {
+  users,
+  sessions,
+  accounts,
+  verifications,
+} from '@/lib/db/schema/users';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
-    usePlural: true,
+    schema: {
+      user: users,
+      session: sessions,
+      account: accounts,
+      verification: verifications,
+    },
   }),
   emailAndPassword: {
     enabled: true,
@@ -19,4 +30,4 @@ export const auth = betterAuth({
 });
 
 export type Session = typeof auth.$Infer.Session;
-export type User = typeof auth.$Infer.User;
+export type User = typeof auth.$Infer.Session.user;
