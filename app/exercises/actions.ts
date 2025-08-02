@@ -2,8 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { requireAuth } from '@/lib/auth/utils';
-import { to, toSync, handleValidationError } from '@/lib/utils/error-handler';
+
+import { to, toSync, handleValidationError, protectedAction } from '@/lib/utils/error-handler';
 import {
   parseCreateExercise,
   parseUpdateExercise,
@@ -20,74 +20,65 @@ import {
   getBuiltInExercises,
 } from '@/lib/db/queries/exercises';
 
-export async function createExerciseAction(
-  prevState: { error?: string; fieldErrors?: Record<string, string[]> },
-  formData: FormData
-) {
-  const [sessionError, session] = await to(requireAuth());
-  if (sessionError || !session) return { error: 'Authentication required' };
+export const createExerciseAction = protectedAction(
+  async (session, prevState: { error?: string; fieldErrors?: Record<string, string[]> }, formData: FormData) => {
+    const [validationError, validatedData] = toSync(() => parseCreateExercise(formData));
+    const validationErrorResult = handleValidationError(validationError, validatedData);
 
-  const [validationError, validatedData] = toSync(() => parseCreateExercise(formData));
-  const validationErrorResult = handleValidationError(validationError, validatedData);
+    if (validationErrorResult) return validationErrorResult;
+    if (!validatedData) return { error: 'Invalid form data' };
 
-  if (validationErrorResult) return validationErrorResult;
-  if (!validatedData) return { error: 'Invalid form data' };
+    const [createError, exercise] = await to(
+      createExercise({
+        name: validatedData.name,
+        description: validatedData.description,
+        muscleGroups: validatedData.muscleGroups,
+        equipment: validatedData.equipment,
+        instructions: validatedData.instructions,
+        imageUrl: validatedData.imageUrl,
+        videoUrl: validatedData.videoUrl,
+        isCustom: true,
+        createdBy: session.user.id,
+      })
+    );
 
-  const [createError, exercise] = await to(
-    createExercise({
-      name: validatedData.name,
-      description: validatedData.description,
-      muscleGroups: validatedData.muscleGroups,
-      equipment: validatedData.equipment,
-      instructions: validatedData.instructions,
-      imageUrl: validatedData.imageUrl,
-      videoUrl: validatedData.videoUrl,
-      isCustom: true,
-      createdBy: session.user.id,
-    })
-  );
+    if (createError || !exercise) {
+      return { error: createError?.message || 'Failed to create exercise' };
+    }
 
-  if (createError || !exercise) {
-    return { error: createError?.message || 'Failed to create exercise' };
+    revalidatePath('/exercises');
+    redirect(`/exercises/${exercise.id}`);
   }
+);
 
-  revalidatePath('/exercises');
-  redirect(`/exercises/${exercise.id}`);
-}
+export const updateExerciseAction = protectedAction(
+  async (
+    session,
+    exerciseId: string,
+    prevState: { error?: string; fieldErrors?: Record<string, string[]> },
+    formData: FormData
+  ) => {
+    const [validationError, validatedData] = toSync(() => parseUpdateExercise(formData));
 
-export async function updateExerciseAction(
-  exerciseId: string,
-  prevState: { error?: string; fieldErrors?: Record<string, string[]> },
-  formData: FormData
-) {
-  const [sessionError, session] = await to(requireAuth());
+    const validationErrorResult = handleValidationError(validationError, validatedData);
+    if (validationErrorResult) return validationErrorResult;
+    if (!validatedData) return { error: 'Invalid form data' };
 
-  if (sessionError || !session) return { error: 'Authentication required' };
+    const [updateError, exercise] = await to(updateExercise(exerciseId, session.user.id, validatedData));
 
-  const [validationError, validatedData] = toSync(() => parseUpdateExercise(formData));
+    if (updateError) {
+      console.error('Exercise update error:', updateError);
+      return { error: updateError.message || 'Failed to update exercise' };
+    }
 
-  const validationErrorResult = handleValidationError(validationError, validatedData);
-  if (validationErrorResult) return validationErrorResult;
-  if (!validatedData) return { error: 'Invalid form data' };
+    revalidatePath('/exercises');
+    revalidatePath(`/exercises/${exerciseId}`);
 
-  const [updateError, exercise] = await to(updateExercise(exerciseId, session.user.id, validatedData));
-
-  if (updateError) {
-    console.error('Exercise update error:', updateError);
-    return { error: updateError.message || 'Failed to update exercise' };
+    return { success: true, data: exercise };
   }
+);
 
-  revalidatePath('/exercises');
-  revalidatePath(`/exercises/${exerciseId}`);
-
-  return { success: true, data: exercise };
-}
-
-export async function deleteExerciseAction(exerciseId: string) {
-  const [sessionError, session] = await to(requireAuth());
-
-  if (sessionError || !session) return { error: 'Authentication required' };
-
+export const deleteExerciseAction = protectedAction(async (session, exerciseId: string) => {
   const [deleteError] = await to(deleteExercise(exerciseId, session.user.id));
 
   if (deleteError) {
@@ -97,7 +88,7 @@ export async function deleteExerciseAction(exerciseId: string) {
 
   revalidatePath('/exercises');
   redirect('/exercises');
-}
+});
 
 export async function searchExercisesAction(params: SearchExercisesInput) {
   const [validationError, validatedParams] = toSync(() => parseSearchExercises(params));
@@ -127,11 +118,7 @@ export async function getAllExercisesAction() {
   return { success: true, data: exercises };
 }
 
-export async function getUserCustomExercisesAction() {
-  const [sessionError, session] = await to(requireAuth());
-
-  if (sessionError || !session) return { error: 'Authentication required' };
-
+export const getUserCustomExercisesAction = protectedAction(async (session) => {
   const [error, exercises] = await to(getUserCustomExercises(session.user.id));
 
   if (error) {
@@ -140,7 +127,7 @@ export async function getUserCustomExercisesAction() {
   }
 
   return { success: true, data: exercises };
-}
+});
 
 export async function getBuiltInExercisesAction() {
   const [error, exercises] = await to(getBuiltInExercises());

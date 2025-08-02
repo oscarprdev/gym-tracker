@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth/utils';
 
 export async function to<T, E = Error>(promise: Promise<T>): Promise<[E | null, T | null]> {
   try {
@@ -37,4 +38,16 @@ export function handleValidationError<T>(
     return { error: 'Invalid form data' };
   }
   return null;
+}
+
+export function protectedAction<T extends unknown[], R>(
+  action: (session: Awaited<ReturnType<typeof requireAuth>>, ...args: T) => Promise<R>
+) {
+  return async (...args: T): Promise<R | { error: string }> => {
+    const [sessionError, session] = await to(requireAuth());
+    if (sessionError || !session) {
+      return { error: 'Authentication required' };
+    }
+    return action(session, ...args);
+  };
 }
