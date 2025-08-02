@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { to } from '@/lib/utils/error-handler';
 
 export function UserMenu() {
   const router = useRouter();
@@ -22,17 +23,12 @@ export function UserMenu() {
 
   const handleSignOut = () => {
     startTransition(async () => {
-      try {
-        await logoutAction();
-      } catch (error) {
-        console.error('Sign out error:', error);
-      }
+      const [error] = await to(logoutAction());
+      if (error) console.error('Sign out error:', error);
     });
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   const initials = user.name
     ? user.name

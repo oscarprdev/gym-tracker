@@ -1,13 +1,10 @@
-// Application constants
 export const APP_NAME = 'Gym Tracker';
 export const APP_DESCRIPTION =
   'Track your workouts, plan your routines, and achieve your fitness goals.';
 
-// Pagination
 export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_PAGE_SIZE = 100;
 
-// Exercise categories
 export const EXERCISE_CATEGORIES = [
   'Chest',
   'Back',
@@ -19,7 +16,6 @@ export const EXERCISE_CATEGORIES = [
   'Full Body',
 ] as const;
 
-// Muscle groups
 export const MUSCLE_GROUPS = [
   'Chest',
   'Back',
@@ -35,7 +31,6 @@ export const MUSCLE_GROUPS = [
   'Obliques',
 ] as const;
 
-// Equipment types
 export const EQUIPMENT_TYPES = [
   'Barbell',
   'Dumbbell',
@@ -48,7 +43,6 @@ export const EQUIPMENT_TYPES = [
   'Other',
 ] as const;
 
-// Workout statuses
 export const WORKOUT_STATUSES = [
   'planned',
   'in_progress',

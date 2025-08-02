@@ -1,4 +1,3 @@
-// Global type definitions
 export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
@@ -19,7 +18,6 @@ export interface SelectOption {
   label: string;
 }
 
-// Utility types
 export type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};

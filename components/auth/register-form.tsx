@@ -3,7 +3,6 @@
 import { useState, useActionState } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { registerAction } from '@/app/auth/register/actions';
-import type { RegisterState } from '@/lib/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,10 +10,7 @@ import { Label } from '@/components/ui/label';
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [state, formAction, isPending] = useActionState<
-    RegisterState | null,
-    FormData
-  >(registerAction, null);
+  const [state, formAction, isPending] = useActionState(registerAction, null);
 
   return (
     <form action={formAction} className="space-y-4">

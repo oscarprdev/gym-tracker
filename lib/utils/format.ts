@@ -1,6 +1,5 @@
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 
-// Date formatting utilities
 export function formatDate(date: Date | string, formatStr = 'PPP'): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return format(dateObj, formatStr);
@@ -35,7 +34,6 @@ export function formatDateRelative(date: Date | string): string {
   return formatDate(dateObj, 'MMM d');
 }
 
-// Duration formatting utilities
 export function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -66,7 +64,6 @@ export function formatDurationWords(seconds: number): string {
   return `${seconds}s`;
 }
 
-// Number formatting utilities
 export function formatWeight(weight: number | string, unit = 'lbs'): string {
   const weightNum = typeof weight === 'string' ? parseFloat(weight) : weight;
   return `${weightNum} ${unit}`;

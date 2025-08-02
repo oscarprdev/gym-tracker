@@ -3,17 +3,13 @@
 import { useState, useActionState } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { loginAction } from '@/app/auth/login/actions';
-import type { LoginState } from '@/lib/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, formAction, isPending] = useActionState<
-    LoginState | null,
-    FormData
-  >(loginAction, null);
+  const [state, formAction, isPending] = useActionState(loginAction, null);
 
   return (
     <form action={formAction} className="space-y-4">
