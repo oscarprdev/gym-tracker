@@ -1,6 +1,6 @@
 import { db } from '../client';
 import { exercises } from '../schema/exercises';
-import { eq, and, like, or, asc, sql } from 'drizzle-orm';
+import { eq, and, like, asc, sql } from 'drizzle-orm';
 import type { Exercise, NewExercise } from '../schema/exercises';
 import type { SearchExercisesInput } from '@/lib/validations/exercises';
 
@@ -37,21 +37,17 @@ export async function getBuiltInExercises(): Promise<Exercise[]> {
 }
 
 export async function searchExercises(params: SearchExercisesInput): Promise<Exercise[]> {
-  const { query, muscleGroups, equipment, isCustom, limit, offset } = params;
+  const { query, muscleGroups, isCustom, limit, offset } = params;
 
   const conditions = [];
 
   if (query) {
-    conditions.push(or(like(exercises.name, `%${query}%`), like(exercises.description, `%${query}%`)));
+    conditions.push(like(exercises.name, `%${query}%`));
   }
 
   if (muscleGroups && muscleGroups.length > 0) {
     // PostgreSQL array overlap operator
     conditions.push(sql`${exercises.muscleGroups} && ${muscleGroups}`);
-  }
-
-  if (equipment) {
-    conditions.push(eq(exercises.equipment, equipment));
   }
 
   if (typeof isCustom === 'boolean') {
@@ -101,8 +97,4 @@ export async function getExercisesByMuscleGroup(muscleGroup: string): Promise<Ex
     .from(exercises)
     .where(sql`${exercises.muscleGroups} @> ARRAY[${muscleGroup}]`)
     .orderBy(asc(exercises.name));
-}
-
-export async function getExercisesByEquipment(equipment: string): Promise<Exercise[]> {
-  return db.select().from(exercises).where(eq(exercises.equipment, equipment)).orderBy(asc(exercises.name));
 }

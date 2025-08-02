@@ -6,21 +6,10 @@ export const createExerciseSchema = z.object({
     .min(1, 'Exercise name is required')
     .min(2, 'Exercise name must be at least 2 characters')
     .max(100, 'Exercise name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
   muscleGroups: z
     .array(z.string())
     .min(1, 'At least one muscle group is required')
     .refine((groups) => groups.every((group) => group.trim().length > 0), 'Muscle groups cannot be empty'),
-  equipment: z.string().max(100, 'Equipment must be less than 100 characters').optional(),
-  instructions: z
-    .array(z.string())
-    .optional()
-    .refine(
-      (instructions) => !instructions || instructions.every((instruction) => instruction.trim().length > 0),
-      'Instructions cannot be empty'
-    ),
-  imageUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  videoUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
 });
 
 export const addExerciseToRoutineSchema = z
@@ -56,7 +45,6 @@ export const updateExerciseSchema = createExerciseSchema.partial();
 export const searchExercisesSchema = z.object({
   query: z.string().max(100, 'Search query too long').optional(),
   muscleGroups: z.array(z.string()).optional(),
-  equipment: z.string().optional(),
   isCustom: z.boolean().optional(),
   limit: z.number().min(1).max(100).default(20),
   offset: z.number().min(0).default(0),
@@ -71,24 +59,14 @@ export type SearchExercisesInput = z.infer<typeof searchExercisesSchema>;
 export function parseCreateExercise(formData: FormData): CreateExerciseInput {
   return createExerciseSchema.parse({
     name: formData.get('name'),
-    description: formData.get('description') || undefined,
     muscleGroups: JSON.parse((formData.get('muscleGroups') as string) || '[]'),
-    equipment: formData.get('equipment') || undefined,
-    instructions: JSON.parse((formData.get('instructions') as string) || '[]'),
-    imageUrl: formData.get('imageUrl') || undefined,
-    videoUrl: formData.get('videoUrl') || undefined,
   });
 }
 
 export function parseUpdateExercise(formData: FormData): UpdateExerciseInput {
   return updateExerciseSchema.parse({
     name: formData.get('name') || undefined,
-    description: formData.get('description') || undefined,
     muscleGroups: formData.get('muscleGroups') ? JSON.parse(formData.get('muscleGroups') as string) : undefined,
-    equipment: formData.get('equipment') || undefined,
-    instructions: formData.get('instructions') ? JSON.parse(formData.get('instructions') as string) : undefined,
-    imageUrl: formData.get('imageUrl') || undefined,
-    videoUrl: formData.get('videoUrl') || undefined,
   });
 }
 

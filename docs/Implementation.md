@@ -192,13 +192,9 @@
 - [x] Design and implement core database schema (users, exercises, routines, sessions)
 - [x] Create exercise management system with CRUD operations
 - [ ] Implement exercise templates and categories
-- [ ] Set up data validation and constraints
 - [ ] Create exercise search and filtering functionality
-- [ ] Implement exercise image/video upload capabilities
-- [ ] Add muscle group and equipment categorization
-- [ ] Create seed data for common exercises
-- [ ] Test database operations and performance
-- [ ] Set up proper database indexes for performance
+- [ ] Create routine builder with exercise selection
+- [ ] Implement sets, reps, and weight configuration
 
 ### Stage 4: Routine Planning & Weekly Scheduling
 
@@ -207,10 +203,6 @@
 
 #### Sub-steps:
 
-- [ ] Implement weekly calendar/planner UI component
-- [ ] Set up drag-and-drop functionality with react-beautiful-dnd
-- [ ] Create routine builder with exercise selection
-- [ ] Implement sets, reps, and weight configuration
 - [ ] Add routine templates and cloning functionality
 - [ ] Create routine validation and error handling
 - [ ] Implement routine scheduling logic
@@ -228,7 +220,8 @@
 - [ ] Create homepage with today's routine display
 - [ ] Implement "Start Workout" session mode
 - [ ] Build exercise cards with expand/collapse functionality
-- [ ] Add real-time workout logging with auto-save
+- [ ] Implement weekly calendar/planner UI component
+- [ ] Set up drag-and-drop functionality with framer-motion
 - [ ] Implement rest timers and workout duration tracking
 - [ ] Create session progress indicators and animations
 - [ ] Add workout completion and summary screens

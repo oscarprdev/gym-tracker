@@ -4,12 +4,7 @@ import { users } from './auth';
 export const exercises = pgTable('exercises', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
-  description: text('description'),
   muscleGroups: text('muscle_groups').array().notNull(),
-  equipment: text('equipment'),
-  instructions: text('instructions').array(),
-  imageUrl: text('image_url'),
-  videoUrl: text('video_url'),
   isCustom: boolean('is_custom').default(false),
   createdBy: text('created_by').references(() => users.id, {
     onDelete: 'set null',

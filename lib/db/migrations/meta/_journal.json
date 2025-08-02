@@ -8,6 +8,13 @@
       "when": 1754127564493,
       "tag": "0000_clean_better_auth_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1754149341485,
+      "tag": "0001_simplify_exercises_schema",
+      "breakpoints": true
     }
   ]
 }
