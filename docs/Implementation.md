@@ -190,7 +190,7 @@
 #### Sub-steps:
 
 - [x] Design and implement core database schema (users, exercises, routines, sessions)
-- [ ] Create exercise management system with CRUD operations
+- [x] Create exercise management system with CRUD operations
 - [ ] Implement exercise templates and categories
 - [ ] Set up data validation and constraints
 - [ ] Create exercise search and filtering functionality
