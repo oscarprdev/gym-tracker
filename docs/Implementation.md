@@ -173,14 +173,14 @@
 
 - [x] Implement user registration
 - [x] Set up protected routes and authentication middleware
-- [ ] Create user profile management functionality
-- [ ] Implement password reset and change password flows
-- [ ] Set up session management with BetterAuth
-- [ ] Create authentication UI components (login, register, forgot password)
-- [ ] Implement proper error handling for authentication flows
-- [ ] Add form validation with Zod schemas
-- [ ] Test authentication flows across different devices
-- [ ] Set up proper TypeScript types for user and session data
+- [x] Create user profile management functionality
+- [x] Implement password reset and change password flows
+- [x] Set up session management with BetterAuth
+- [x] Create authentication UI components (login, register, forgot password)
+- [x] Implement proper error handling for authentication flows
+- [x] Add form validation with Zod schemas
+- [x] Test authentication flows across different devices
+- [x] Set up proper TypeScript types for user and session data
 
 ### Stage 3: Database Design & Exercise Management
 
@@ -189,7 +189,7 @@
 
 #### Sub-steps:
 
-- [ ] Design and implement core database schema (users, exercises, routines, sessions)
+- [x] Design and implement core database schema (users, exercises, routines, sessions)
 - [ ] Create exercise management system with CRUD operations
 - [ ] Implement exercise templates and categories
 - [ ] Set up data validation and constraints
