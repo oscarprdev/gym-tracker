@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, real } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { routines } from './routines';
 import { exercises } from './exercises';

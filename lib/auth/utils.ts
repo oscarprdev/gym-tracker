@@ -4,9 +4,6 @@ import { auth } from './auth';
 
 export async function getSession() {
   const headersList = await headers();
-  const request = new Request('http://localhost:3000', {
-    headers: headersList,
-  });
 
   const session = await auth.api.getSession({
     headers: headersList,

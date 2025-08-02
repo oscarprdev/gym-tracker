@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import { authClient } from '@/lib/auth/auth-client';
 
 interface AuthProviderProps {
