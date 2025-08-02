@@ -1,14 +1,24 @@
-import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  integer,
+  decimal,
+  boolean,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { routines } from './routines';
 import { exercises } from './exercises';
 
 export const workoutSessions = pgTable('workout_sessions', {
-  id: text('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  routineId: text('routine_id').references(() => routines.id),
+  routineId: uuid('routine_id').references(() => routines.id, {
+    onDelete: 'set null',
+  }),
   name: text('name').notNull(),
   status: text('status', {
     enum: ['planned', 'in_progress', 'completed', 'skipped'],
@@ -18,18 +28,15 @@ export const workoutSessions = pgTable('workout_sessions', {
   duration: integer('duration'), // in seconds
   notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const exerciseLogs = pgTable('exercise_logs', {
-  id: text('id').primaryKey(),
-  sessionId: text('session_id')
+  id: uuid('id').defaultRandom().primaryKey(),
+  sessionId: uuid('session_id')
     .notNull()
     .references(() => workoutSessions.id, { onDelete: 'cascade' }),
-  exerciseId: text('exercise_id')
+  exerciseId: uuid('exercise_id')
     .notNull()
     .references(() => exercises.id, { onDelete: 'cascade' }),
   order: integer('order').notNull(),
@@ -38,15 +45,15 @@ export const exerciseLogs = pgTable('exercise_logs', {
 });
 
 export const setLogs = pgTable('set_logs', {
-  id: text('id').primaryKey(),
-  exerciseLogId: text('exercise_log_id')
+  id: uuid('id').defaultRandom().primaryKey(),
+  exerciseLogId: uuid('exercise_log_id')
     .notNull()
     .references(() => exerciseLogs.id, { onDelete: 'cascade' }),
   setNumber: integer('set_number').notNull(),
-  reps: integer('reps').notNull(),
-  weight: text('weight').notNull(), // Stored as text to handle different units
-  isCompleted: integer('is_completed').default(1), // 0 = false, 1 = true
-  isWarmup: integer('is_warmup').default(0), // 0 = false, 1 = true
+  reps: integer('reps'),
+  weight: decimal('weight', { precision: 5, scale: 2 }),
+  isCompleted: boolean('is_completed').default(false),
+  isWarmup: boolean('is_warmup').default(false),
   restTime: integer('rest_time'), // actual rest time in seconds
   rpe: integer('rpe'), // Rate of Perceived Exertion (1-10)
   notes: text('notes'),

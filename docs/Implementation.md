@@ -111,7 +111,7 @@
 - [x] Configure BetterAuth for authentication system
 - [x] Set up TanStack Query with proper SSR configuration
 - [x] Create basic project structure and core utilities
-- [ ] Set up database schema and initial migrations
+- [x] Set up database schema and initial migrations
 - [ ] Implement basic authentication flows (signup/signin/signout)
 
 ### Stage 2: Core Authentication & User Management

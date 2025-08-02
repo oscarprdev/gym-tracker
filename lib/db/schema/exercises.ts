@@ -1,23 +1,22 @@
-import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, uuid } from 'drizzle-orm/pg-core';
+import { users } from './users';
 
 export const exercises = pgTable('exercises', {
-  id: text('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
-  instructions: text('instructions'),
-  muscleGroups: text('muscle_groups').array(),
+  muscleGroups: text('muscle_groups').array().notNull(),
   equipment: text('equipment'),
-  category: text('category').notNull(),
-  isCustom: integer('is_custom').default(0), // 0 = default, 1 = custom
-  createdBy: text('created_by').references(() => users.id),
+  instructions: text('instructions').array(),
+  imageUrl: text('image_url'),
+  videoUrl: text('video_url'),
+  isCustom: boolean('is_custom').default(false),
+  createdBy: text('created_by').references(() => users.id, {
+    onDelete: 'set null',
+  }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-
-import { users } from './users';
 
 export type Exercise = typeof exercises.$inferSelect;
 export type NewExercise = typeof exercises.$inferInsert;
