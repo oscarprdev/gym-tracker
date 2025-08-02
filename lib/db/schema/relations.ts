@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
-import { users } from './users';
+import { users } from './auth';
 import { exercises } from './exercises';
 import { routines, routineExercises, weeklySchedule } from './routines';
 import { workoutSessions, exerciseLogs, setLogs } from './workout-sessions';
 
 // User relations
-export const usersRelations = relations(users, ({ many }) => ({
+export const userRelations = relations(users, ({ many }) => ({
   routines: many(routines),
   workoutSessions: many(workoutSessions),
   weeklySchedule: many(weeklySchedule),

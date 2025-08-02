@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { requireAuth } from '@/lib/auth/utils';
+import { requireAuth } from '@/lib/auth/dal';
 import { UserMenu } from '@/components/auth/user-menu';
 import {
   Card,

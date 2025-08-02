@@ -36,6 +36,7 @@ export async function loginAction(
       body: {
         email: validatedData.email,
         password: validatedData.password,
+        rememberMe: true,
       },
       headers: await headers(),
     })

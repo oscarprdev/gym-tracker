@@ -7,7 +7,7 @@ import {
   boolean,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { users } from './users';
+import { users } from './auth';
 import { routines } from './routines';
 import { exercises } from './exercises';
 

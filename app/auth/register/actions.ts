@@ -1,7 +1,6 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { z } from 'zod';
 import { auth } from '@/lib/auth/auth';
 import { registerSchema } from '@/lib/validations/auth';
@@ -45,7 +44,6 @@ export async function registerAction(
         email: validatedData.email,
         password: validatedData.password,
       },
-      headers: await headers(),
     })
   );
 
@@ -62,5 +60,5 @@ export async function registerAction(
     };
   }
 
-  redirect('/dashboard');
+  redirect('/auth/login');
 }

@@ -43,7 +43,6 @@ export function useSignIn() {
       return result;
     },
     onSuccess: () => {
-      // Invalidate and refetch auth queries
       queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
   });

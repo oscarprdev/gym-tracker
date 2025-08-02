@@ -7,7 +7,7 @@ import {
   boolean,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { users } from './users';
+import { users } from './auth';
 import { exercises } from './exercises';
 
 export const routines = pgTable('routines', {

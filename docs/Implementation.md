@@ -171,8 +171,8 @@
 
 #### Sub-steps:
 
-- [ ] Implement user registration
-- [ ] Set up protected routes and authentication middleware
+- [x] Implement user registration
+- [x] Set up protected routes and authentication middleware
 - [ ] Create user profile management functionality
 - [ ] Implement password reset and change password flows
 - [ ] Set up session management with BetterAuth
