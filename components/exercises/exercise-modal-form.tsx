@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, X } from 'lucide-react';
 import { createExerciseAction, updateExerciseAction } from '@/app/exercises/actions';
 import type { Exercise } from '@/lib/db/schema/exercises';
+import { MUSCLE_GROUPS } from '@/lib/utils';
 
 type FormState = {
   error: string | null;
@@ -20,21 +21,6 @@ interface ExerciseModalFormProps {
   mode: 'create' | 'edit';
   onSuccess?: () => void;
 }
-
-const COMMON_MUSCLE_GROUPS = [
-  'Chest',
-  'Back',
-  'Shoulders',
-  'Arms',
-  'Legs',
-  'Core',
-  'Glutes',
-  'Biceps',
-  'Triceps',
-  'Quadriceps',
-  'Hamstrings',
-  'Calves',
-];
 
 export function ExerciseModalForm({ exercise, mode, onSuccess }: ExerciseModalFormProps) {
   const [muscleGroups, setMuscleGroups] = useState<string[]>(exercise?.muscleGroups || []);
@@ -128,7 +114,7 @@ export function ExerciseModalForm({ exercise, mode, onSuccess }: ExerciseModalFo
           </Button>
         </div>
         <div className="flex flex-wrap gap-1 mt-2">
-          {COMMON_MUSCLE_GROUPS.map((group) => (
+          {MUSCLE_GROUPS.map((group) => (
             <Button
               key={group}
               type="button"

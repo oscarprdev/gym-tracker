@@ -191,8 +191,8 @@
 
 - [x] Design and implement core database schema (users, exercises, routines, sessions)
 - [x] Create exercise management system with CRUD operations
-- [ ] Implement exercise templates and categories
-- [ ] Create exercise search and filtering functionality
+- [x] Implement exercise templates and categories
+- [x] Create exercise search and filtering functionality
 - [ ] Create routine builder with exercise selection
 - [ ] Implement sets, reps, and weight configuration
 
