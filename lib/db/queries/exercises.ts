@@ -15,11 +15,7 @@ export async function createExercise(data: NewExercise): Promise<Exercise> {
 }
 
 export async function getExerciseById(id: string): Promise<Exercise | null> {
-  const result = await db
-    .select()
-    .from(exercises)
-    .where(eq(exercises.id, id))
-    .limit(1);
+  const result = await db.select().from(exercises).where(eq(exercises.id, id)).limit(1);
 
   return result[0] || null;
 }
@@ -28,9 +24,7 @@ export async function getAllExercises(): Promise<Exercise[]> {
   return db.select().from(exercises).orderBy(asc(exercises.name));
 }
 
-export async function getUserCustomExercises(
-  userId: string
-): Promise<Exercise[]> {
+export async function getUserCustomExercises(userId: string): Promise<Exercise[]> {
   return db
     .select()
     .from(exercises)
@@ -39,27 +33,16 @@ export async function getUserCustomExercises(
 }
 
 export async function getBuiltInExercises(): Promise<Exercise[]> {
-  return db
-    .select()
-    .from(exercises)
-    .where(eq(exercises.isCustom, false))
-    .orderBy(asc(exercises.name));
+  return db.select().from(exercises).where(eq(exercises.isCustom, false)).orderBy(asc(exercises.name));
 }
 
-export async function searchExercises(
-  params: SearchExercisesInput
-): Promise<Exercise[]> {
+export async function searchExercises(params: SearchExercisesInput): Promise<Exercise[]> {
   const { query, muscleGroups, equipment, isCustom, limit, offset } = params;
 
   const conditions = [];
 
   if (query) {
-    conditions.push(
-      or(
-        like(exercises.name, `%${query}%`),
-        like(exercises.description, `%${query}%`)
-      )
-    );
+    conditions.push(or(like(exercises.name, `%${query}%`), like(exercises.description, `%${query}%`)));
   }
 
   if (muscleGroups && muscleGroups.length > 0) {
@@ -84,11 +67,7 @@ export async function searchExercises(
     .offset(offset);
 }
 
-export async function updateExercise(
-  id: string,
-  userId: string,
-  data: Partial<NewExercise>
-): Promise<Exercise> {
+export async function updateExercise(id: string, userId: string, data: Partial<NewExercise>): Promise<Exercise> {
   const [exercise] = await db
     .update(exercises)
     .set({
@@ -105,10 +84,7 @@ export async function updateExercise(
   return exercise;
 }
 
-export async function deleteExercise(
-  id: string,
-  userId: string
-): Promise<void> {
+export async function deleteExercise(id: string, userId: string): Promise<void> {
   const result = await db
     .delete(exercises)
     .where(and(eq(exercises.id, id), eq(exercises.createdBy, userId)))
@@ -119,9 +95,7 @@ export async function deleteExercise(
   }
 }
 
-export async function getExercisesByMuscleGroup(
-  muscleGroup: string
-): Promise<Exercise[]> {
+export async function getExercisesByMuscleGroup(muscleGroup: string): Promise<Exercise[]> {
   return db
     .select()
     .from(exercises)
@@ -129,12 +103,6 @@ export async function getExercisesByMuscleGroup(
     .orderBy(asc(exercises.name));
 }
 
-export async function getExercisesByEquipment(
-  equipment: string
-): Promise<Exercise[]> {
-  return db
-    .select()
-    .from(exercises)
-    .where(eq(exercises.equipment, equipment))
-    .orderBy(asc(exercises.name));
+export async function getExercisesByEquipment(equipment: string): Promise<Exercise[]> {
+  return db.select().from(exercises).where(eq(exercises.equipment, equipment)).orderBy(asc(exercises.name));
 }

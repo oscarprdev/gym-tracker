@@ -16,10 +16,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
-  const [state, formAction, isPending] = useActionState(
-    updateProfileAction,
-    null
-  );
+  const [state, formAction, isPending] = useActionState(updateProfileAction, null);
 
   return (
     <div className="space-y-6">
@@ -45,11 +42,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               required
             />
           </div>
-          {state?.fieldErrors?.name?.[0] && (
-            <p className="text-sm text-destructive">
-              {state.fieldErrors.name[0]}
-            </p>
-          )}
+          {state?.fieldErrors?.name?.[0] && <p className="text-sm text-destructive">{state.fieldErrors.name[0]}</p>}
         </div>
 
         <div className="space-y-2">
@@ -67,11 +60,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               required
             />
           </div>
-          {state?.fieldErrors?.email?.[0] && (
-            <p className="text-sm text-destructive">
-              {state.fieldErrors.email[0]}
-            </p>
-          )}
+          {state?.fieldErrors?.email?.[0] && <p className="text-sm text-destructive">{state.fieldErrors.email[0]}</p>}
         </div>
 
         <div className="flex justify-end">

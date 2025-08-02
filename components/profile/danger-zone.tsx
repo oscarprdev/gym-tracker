@@ -17,10 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export function DangerZone() {
-  const [state, formAction, isPending] = useActionState(
-    deleteAccountAction,
-    null
-  );
+  const [state, formAction, isPending] = useActionState(deleteAccountAction, null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,33 +35,25 @@ export function DangerZone() {
         <div className="flex items-start space-x-3">
           <AlertTriangle className="h-6 w-6 text-red-600 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">
-              Delete Account
-            </h3>
+            <h3 className="text-lg font-semibold text-red-900 mb-2">Delete Account</h3>
             <p className="text-red-700 text-sm mb-4">
-              Once you delete your account, there is no going back. This action
-              cannot be undone. All of your workout data, routines, and progress
-              will be permanently deleted.
+              Once you delete your account, there is no going back. This action cannot be undone. All of your workout
+              data, routines, and progress will be permanently deleted.
             </p>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  className="bg-red-600 hover:bg-red-700"
-                >
+                <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Account
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle className="text-red-900">
-                    Delete Account
-                  </DialogTitle>
+                  <DialogTitle className="text-red-900">Delete Account</DialogTitle>
                   <DialogDescription className="text-red-700">
-                    This action cannot be undone. This will permanently delete
-                    your account and remove all your data from our servers.
+                    This action cannot be undone. This will permanently delete your account and remove all your data
+                    from our servers.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -97,30 +86,17 @@ export function DangerZone() {
                         onClick={togglePasswordVisibility}
                         disabled={isPending}
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                        <span className="sr-only">
-                          {showPassword ? 'Hide password' : 'Show password'}
-                        </span>
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
                       </Button>
                     </div>
                     {state?.fieldErrors?.password?.[0] && (
-                      <p className="text-sm text-destructive">
-                        {state.fieldErrors.password[0]}
-                      </p>
+                      <p className="text-sm text-destructive">{state.fieldErrors.password[0]}</p>
                     )}
                   </div>
 
                   <DialogFooter className="flex gap-2 sm:gap-0">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleDialogClose}
-                      disabled={isPending}
-                    >
+                    <Button type="button" variant="outline" onClick={handleDialogClose} disabled={isPending}>
                       Cancel
                     </Button>
                     <Button

@@ -1,6 +1,5 @@
 export const APP_NAME = 'Gym Tracker';
-export const APP_DESCRIPTION =
-  'Track your workouts, plan your routines, and achieve your fitness goals.';
+export const APP_DESCRIPTION = 'Track your workouts, plan your routines, and achieve your fitness goals.';
 
 export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_PAGE_SIZE = 100;
@@ -43,12 +42,7 @@ export const EQUIPMENT_TYPES = [
   'Other',
 ] as const;
 
-export const WORKOUT_STATUSES = [
-  'planned',
-  'in_progress',
-  'completed',
-  'skipped',
-] as const;
+export const WORKOUT_STATUSES = ['planned', 'in_progress', 'completed', 'skipped'] as const;
 
 export type ExerciseCategory = (typeof EXERCISE_CATEGORIES)[number];
 export type MuscleGroup = (typeof MUSCLE_GROUPS)[number];

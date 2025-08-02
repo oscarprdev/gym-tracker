@@ -5,9 +5,7 @@ import { getUser, requireAuth } from './dal';
  * Higher-order function to protect server components
  * Redirects to login if user is not authenticated
  */
-export function withAuth<P extends Record<string, unknown>>(
-  Component: React.ComponentType<P>
-) {
+export function withAuth<P extends Record<string, unknown>>(Component: React.ComponentType<P>) {
   return async function AuthProtectedComponent(props: P) {
     const user = await getUser();
 

@@ -67,9 +67,7 @@ Implement clean error handling across the full stack:
 
 ```typescript
 // lib/utils/error-handler.ts - Shared error handling utilities
-export async function to<T, E = Error>(
-  promise: Promise<T>
-): Promise<[E | null, T | null]> {
+export async function to<T, E = Error>(promise: Promise<T>): Promise<[E | null, T | null]> {
   try {
     const data = await promise;
     return [null, data];
@@ -187,13 +185,9 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ['/dashboard', '/routines', '/workout'];
   const authRoutes = ['/auth/login', '/auth/register'];
 
-  const isProtected = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const isProtected = protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
-  const isAuthRoute = authRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
   // Redirect logic
   if (isProtected && !session) {

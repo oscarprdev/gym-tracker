@@ -27,10 +27,7 @@ export default async function ExercisePage({ params }: ExercisePageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link
-          href="/exercises"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
-        >
+        <Link href="/exercises" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Exercises
         </Link>
@@ -41,9 +38,7 @@ export default async function ExercisePage({ params }: ExercisePageProps) {
               <h1 className="text-3xl font-bold">{exercise.name}</h1>
               {exercise.isCustom && <Badge variant="secondary">Custom</Badge>}
             </div>
-            {exercise.equipment && (
-              <p className="text-gray-600">Equipment: {exercise.equipment}</p>
-            )}
+            {exercise.equipment && <p className="text-gray-600">Equipment: {exercise.equipment}</p>}
           </div>
 
           {isOwner && (
@@ -54,11 +49,7 @@ export default async function ExercisePage({ params }: ExercisePageProps) {
                   Edit
                 </Button>
               </Link>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-red-600 hover:text-red-700"
-              >
+              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </Button>

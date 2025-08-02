@@ -4,13 +4,7 @@ import { UserMenu } from '@/components/auth/user-menu';
 import { ProfileForm } from '@/components/profile/profile-form';
 import { ChangePasswordForm } from '@/components/profile/change-password-form';
 import { DangerZone } from '@/components/profile/danger-zone';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const metadata: Metadata = {
@@ -38,12 +32,8 @@ export default async function ProfilePage() {
         <div className="space-y-8">
           {/* Page Header */}
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">
-              Profile Settings
-            </h2>
-            <p className="text-gray-600 mt-2">
-              Manage your account settings and preferences
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900">Profile Settings</h2>
+            <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
           </div>
 
           <div className="max-w-4xl">
@@ -58,9 +48,7 @@ export default async function ProfilePage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Profile Information</CardTitle>
-                    <CardDescription>
-                      Update your personal information and email address
-                    </CardDescription>
+                    <CardDescription>Update your personal information and email address</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ProfileForm user={session.user} />
@@ -72,9 +60,7 @@ export default async function ProfilePage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Password</CardTitle>
-                    <CardDescription>
-                      Change your password to keep your account secure
-                    </CardDescription>
+                    <CardDescription>Change your password to keep your account secure</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ChangePasswordForm />
@@ -85,12 +71,8 @@ export default async function ProfilePage() {
               <TabsContent value="danger">
                 <Card className="border-destructive">
                   <CardHeader>
-                    <CardTitle className="text-destructive">
-                      Danger Zone
-                    </CardTitle>
-                    <CardDescription>
-                      Irreversible and destructive actions
-                    </CardDescription>
+                    <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                    <CardDescription>Irreversible and destructive actions</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <DangerZone />

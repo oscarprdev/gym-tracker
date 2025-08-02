@@ -29,13 +29,7 @@ export function useSignIn() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
+    mutationFn: async ({ email, password }: { email: string; password: string }) => {
       const result = await authClient.signIn.email({
         email,
         password,
@@ -52,15 +46,7 @@ export function useSignUp() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      email,
-      password,
-      name,
-    }: {
-      email: string;
-      password: string;
-      name: string;
-    }) => {
+    mutationFn: async ({ email, password, name }: { email: string; password: string; name: string }) => {
       const result = await authClient.signUp.email({
         email,
         password,

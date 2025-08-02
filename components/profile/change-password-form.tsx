@@ -8,10 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export function ChangePasswordForm() {
-  const [state, formAction, isPending] = useActionState(
-    changePasswordAction,
-    null
-  );
+  const [state, formAction, isPending] = useActionState(changePasswordAction, null);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
@@ -55,20 +52,12 @@ export function ChangePasswordForm() {
               onClick={() => togglePasswordVisibility('current')}
               disabled={isPending}
             >
-              {showPasswords.current ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-              <span className="sr-only">
-                {showPasswords.current ? 'Hide password' : 'Show password'}
-              </span>
+              {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">{showPasswords.current ? 'Hide password' : 'Show password'}</span>
             </Button>
           </div>
           {state?.fieldErrors?.currentPassword?.[0] && (
-            <p className="text-sm text-destructive">
-              {state.fieldErrors.currentPassword[0]}
-            </p>
+            <p className="text-sm text-destructive">{state.fieldErrors.currentPassword[0]}</p>
           )}
         </div>
 
@@ -93,20 +82,12 @@ export function ChangePasswordForm() {
               onClick={() => togglePasswordVisibility('new')}
               disabled={isPending}
             >
-              {showPasswords.new ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-              <span className="sr-only">
-                {showPasswords.new ? 'Hide password' : 'Show password'}
-              </span>
+              {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">{showPasswords.new ? 'Hide password' : 'Show password'}</span>
             </Button>
           </div>
           {state?.fieldErrors?.newPassword?.[0] && (
-            <p className="text-sm text-destructive">
-              {state.fieldErrors.newPassword[0]}
-            </p>
+            <p className="text-sm text-destructive">{state.fieldErrors.newPassword[0]}</p>
           )}
         </div>
 
@@ -131,20 +112,12 @@ export function ChangePasswordForm() {
               onClick={() => togglePasswordVisibility('confirm')}
               disabled={isPending}
             >
-              {showPasswords.confirm ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-              <span className="sr-only">
-                {showPasswords.confirm ? 'Hide password' : 'Show password'}
-              </span>
+              {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">{showPasswords.confirm ? 'Hide password' : 'Show password'}</span>
             </Button>
           </div>
           {state?.fieldErrors?.confirmPassword?.[0] && (
-            <p className="text-sm text-destructive">
-              {state.fieldErrors.confirmPassword[0]}
-            </p>
+            <p className="text-sm text-destructive">{state.fieldErrors.confirmPassword[0]}</p>
           )}
         </div>
 

@@ -128,10 +128,7 @@ export async function GET(request: NextRequest) {
   const sessionData = await verifySession();
 
   if (!sessionData) {
-    return NextResponse.json(
-      { error: 'Authentication required' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
   // Return protected data

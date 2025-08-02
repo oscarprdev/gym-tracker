@@ -14,10 +14,7 @@ const eslintConfig = [
   ...compat.extends('prettier'),
   {
     rules: {
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_' },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'prefer-const': 'error',
     },
   },

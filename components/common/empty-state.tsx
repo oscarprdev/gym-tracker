@@ -11,12 +11,7 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({
-  title,
-  description,
-  icon,
-  action,
-}: EmptyStateProps) {
+export function EmptyState({ title, description, icon, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center">
       {icon && <div className="mb-4 text-muted-foreground/60">{icon}</div>}

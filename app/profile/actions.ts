@@ -1,21 +1,12 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/dal';
 import { auth } from '@/lib/auth/auth';
-import { to, toSync } from '@/lib/utils/error-handler';
-import {
-  updateProfileSchema,
-  changePasswordSchema,
-  deleteAccountSchema,
-} from '@/lib/validations/auth';
+import { to, toSync, handleValidationError } from '@/lib/utils/error-handler';
+import { parseUpdateProfile, parseChangePassword, parseDeleteAccount } from '@/lib/validations/auth';
 import { getUserByEmail, updateUserProfile } from '@/lib/db/queries';
-import type {
-  UpdateProfileState,
-  ChangePasswordState,
-  DeleteAccountState,
-} from '@/lib/types/auth';
+import type { UpdateProfileState, ChangePasswordState, DeleteAccountState } from '@/lib/types/auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -25,27 +16,14 @@ export async function updateProfileAction(
 ): Promise<UpdateProfileState> {
   const session = await requireAuth();
 
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
+  const [validationError, validatedData] = toSync(() => parseUpdateProfile(formData));
 
-  const [validationError, validatedData] = toSync(() =>
-    updateProfileSchema.parse({ name, email })
-  );
+  const validationErrorResult = handleValidationError(validationError, validatedData);
+  if (validationErrorResult) return validationErrorResult;
+  if (!validatedData) return { error: 'Invalid form data' };
 
-  if (validationError || !validatedData) {
-    if (validationError instanceof z.ZodError) {
-      return {
-        error: validationError.issues[0]?.message || 'Invalid form data',
-        fieldErrors: validationError.flatten().fieldErrors,
-      };
-    }
-    return {
-      error: 'Invalid form data',
-    };
-  }
-
-  if (email !== session.user.email) {
-    const [emailCheckError, existingUser] = await to(getUserByEmail(email));
+  if (validatedData.email !== session.user.email) {
+    const [emailCheckError, existingUser] = await to(getUserByEmail(validatedData.email));
 
     if (emailCheckError) {
       return {
@@ -89,29 +67,11 @@ export async function changePasswordAction(
 ): Promise<ChangePasswordState> {
   await requireAuth();
 
-  const currentPassword = formData.get('currentPassword') as string;
-  const newPassword = formData.get('newPassword') as string;
-  const confirmPassword = formData.get('confirmPassword') as string;
+  const [validationError, validatedData] = toSync(() => parseChangePassword(formData));
 
-  const [validationError, validatedData] = toSync(() =>
-    changePasswordSchema.parse({
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    })
-  );
-
-  if (validationError || !validatedData) {
-    if (validationError instanceof z.ZodError) {
-      return {
-        error: validationError.issues[0]?.message || 'Invalid form data',
-        fieldErrors: validationError.flatten().fieldErrors,
-      };
-    }
-    return {
-      error: 'Invalid form data',
-    };
-  }
+  const validationErrorResult = handleValidationError(validationError, validatedData);
+  if (validationErrorResult) return validationErrorResult;
+  if (!validatedData) return { error: 'Invalid form data' };
 
   const [authError, result] = await to(
     auth.api.changePassword({
@@ -126,9 +86,7 @@ export async function changePasswordAction(
 
   if (authError || !result) {
     return {
-      error:
-        authError?.message ||
-        'Failed to change password. Please check your current password.',
+      error: authError?.message || 'Failed to change password. Please check your current password.',
     };
   }
 
@@ -144,23 +102,11 @@ export async function deleteAccountAction(
   prevState: DeleteAccountState | null,
   formData: FormData
 ): Promise<DeleteAccountState> {
-  const password = formData.get('password') as string;
+  const [validationError, validatedData] = toSync(() => parseDeleteAccount(formData));
 
-  const [validationError, validatedData] = toSync(() =>
-    deleteAccountSchema.parse({ password })
-  );
-
-  if (validationError || !validatedData) {
-    if (validationError instanceof z.ZodError) {
-      return {
-        error: validationError.issues[0]?.message || 'Password is required',
-        fieldErrors: validationError.flatten().fieldErrors,
-      };
-    }
-    return {
-      error: 'Password is required to delete account',
-    };
-  }
+  const validationErrorResult = handleValidationError(validationError, validatedData);
+  if (validationErrorResult) return validationErrorResult;
+  if (!validatedData) return { error: 'Invalid form data' };
 
   const [authError, result] = await to(
     auth.api.deleteUser({
@@ -173,9 +119,7 @@ export async function deleteAccountAction(
 
   if (authError || !result) {
     return {
-      error:
-        authError?.message ||
-        'Failed to delete account. Please check your password.',
+      error: authError?.message || 'Failed to delete account. Please check your password.',
     };
   }
 

@@ -18,9 +18,7 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.string().url(),
 
     // Node Environment
-    NODE_ENV: z
-      .enum(['development', 'test', 'production'])
-      .default('development'),
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   },
 
   /*

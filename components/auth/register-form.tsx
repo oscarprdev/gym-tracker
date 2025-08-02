@@ -22,36 +22,14 @@ export function RegisterForm() {
 
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
-        <Input
-          id="name"
-          name="name"
-          type="text"
-          placeholder="Enter your full name"
-          disabled={isPending}
-          required
-        />
-        {state?.fieldErrors?.name?.[0] && (
-          <p className="text-sm text-destructive">
-            {state.fieldErrors.name[0]}
-          </p>
-        )}
+        <Input id="name" name="name" type="text" placeholder="Enter your full name" disabled={isPending} required />
+        {state?.fieldErrors?.name?.[0] && <p className="text-sm text-destructive">{state.fieldErrors.name[0]}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          disabled={isPending}
-          required
-        />
-        {state?.fieldErrors?.email?.[0] && (
-          <p className="text-sm text-destructive">
-            {state.fieldErrors.email[0]}
-          </p>
-        )}
+        <Input id="email" name="email" type="email" placeholder="Enter your email" disabled={isPending} required />
+        {state?.fieldErrors?.email?.[0] && <p className="text-sm text-destructive">{state.fieldErrors.email[0]}</p>}
       </div>
 
       <div className="space-y-2">
@@ -73,20 +51,12 @@ export function RegisterForm() {
             onClick={() => setShowPassword(!showPassword)}
             disabled={isPending}
           >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            <span className="sr-only">
-              {showPassword ? 'Hide password' : 'Show password'}
-            </span>
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
           </Button>
         </div>
         {state?.fieldErrors?.password?.[0] && (
-          <p className="text-sm text-destructive">
-            {state.fieldErrors.password[0]}
-          </p>
+          <p className="text-sm text-destructive">{state.fieldErrors.password[0]}</p>
         )}
       </div>
 
@@ -109,20 +79,12 @@ export function RegisterForm() {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             disabled={isPending}
           >
-            {showConfirmPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            <span className="sr-only">
-              {showConfirmPassword ? 'Hide password' : 'Show password'}
-            </span>
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            <span className="sr-only">{showConfirmPassword ? 'Hide password' : 'Show password'}</span>
           </Button>
         </div>
         {state?.fieldErrors?.confirmPassword?.[0] && (
-          <p className="text-sm text-destructive">
-            {state.fieldErrors.confirmPassword[0]}
-          </p>
+          <p className="text-sm text-destructive">{state.fieldErrors.confirmPassword[0]}</p>
         )}
       </div>
 

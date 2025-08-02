@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  integer,
-  decimal,
-  boolean,
-  uuid,
-} from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, decimal, boolean, uuid } from 'drizzle-orm/pg-core';
 import { users } from './auth';
 import { routines } from './routines';
 import { exercises } from './exercises';

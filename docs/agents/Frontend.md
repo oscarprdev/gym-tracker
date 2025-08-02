@@ -65,9 +65,7 @@ Use tuple-based error handling for cleaner, more readable code:
 
 ```typescript
 // lib/utils/error-handler.ts - Go-style error handling utilities
-export async function to<T, E = Error>(
-  promise: Promise<T>
-): Promise<[E | null, T | null]> {
+export async function to<T, E = Error>(promise: Promise<T>): Promise<[E | null, T | null]> {
   try {
     const data = await promise;
     return [null, data];
@@ -640,12 +638,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ```typescript
 // hooks/use-workouts.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  createWorkout,
-  getWorkouts,
-  updateWorkout,
-  deleteWorkout,
-} from '@/lib/api/workouts';
+import { createWorkout, getWorkouts, updateWorkout, deleteWorkout } from '@/lib/api/workouts';
 
 export function useWorkouts() {
   return useQuery({
@@ -712,10 +705,7 @@ export function useStartWorkout() {
     },
     onError: (err, workoutId, context) => {
       // Rollback on error
-      queryClient.setQueryData(
-        ['workouts', workoutId],
-        context?.previousWorkout
-      );
+      queryClient.setQueryData(['workouts', workoutId], context?.previousWorkout);
     },
     onSettled: (data, error, workoutId) => {
       // Always refetch after error or success

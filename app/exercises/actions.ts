@@ -2,13 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/utils';
-import { to, toSync } from '@/lib/utils/error-handler';
+import { to, toSync, handleValidationError } from '@/lib/utils/error-handler';
 import {
-  createExerciseSchema,
-  updateExerciseSchema,
-  searchExercisesSchema,
+  parseCreateExercise,
+  parseUpdateExercise,
+  parseSearchExercises,
   type SearchExercisesInput,
 } from '@/lib/validations/exercises';
 import {
@@ -26,36 +25,13 @@ export async function createExerciseAction(
   formData: FormData
 ) {
   const [sessionError, session] = await to(requireAuth());
+  if (sessionError || !session) return { error: 'Authentication required' };
 
-  if (sessionError || !session) {
-    return { error: 'Authentication required' };
-  }
+  const [validationError, validatedData] = toSync(() => parseCreateExercise(formData));
+  const validationErrorResult = handleValidationError(validationError, validatedData);
 
-  const [validationError, validatedData] = toSync(() =>
-    createExerciseSchema.parse({
-      name: formData.get('name'),
-      description: formData.get('description') || undefined,
-      muscleGroups: JSON.parse(
-        (formData.get('muscleGroups') as string) || '[]'
-      ),
-      equipment: formData.get('equipment') || undefined,
-      instructions: JSON.parse(
-        (formData.get('instructions') as string) || '[]'
-      ),
-      imageUrl: formData.get('imageUrl') || undefined,
-      videoUrl: formData.get('videoUrl') || undefined,
-    })
-  );
-
-  if (validationError || !validatedData) {
-    if (validationError instanceof z.ZodError) {
-      return {
-        error: validationError.issues[0]?.message || 'Invalid form data',
-        fieldErrors: validationError.flatten().fieldErrors,
-      };
-    }
-    return { error: 'Invalid form data' };
-  }
+  if (validationErrorResult) return validationErrorResult;
+  if (!validatedData) return { error: 'Invalid form data' };
 
   const [createError, exercise] = await to(
     createExercise({
@@ -72,7 +48,6 @@ export async function createExerciseAction(
   );
 
   if (createError || !exercise) {
-    console.error('Exercise creation error:', createError);
     return { error: createError?.message || 'Failed to create exercise' };
   }
 
@@ -87,39 +62,15 @@ export async function updateExerciseAction(
 ) {
   const [sessionError, session] = await to(requireAuth());
 
-  if (sessionError || !session) {
-    return { error: 'Authentication required' };
-  }
+  if (sessionError || !session) return { error: 'Authentication required' };
 
-  const [validationError, validatedData] = toSync(() =>
-    updateExerciseSchema.parse({
-      name: formData.get('name') || undefined,
-      description: formData.get('description') || undefined,
-      muscleGroups: formData.get('muscleGroups')
-        ? JSON.parse(formData.get('muscleGroups') as string)
-        : undefined,
-      equipment: formData.get('equipment') || undefined,
-      instructions: formData.get('instructions')
-        ? JSON.parse(formData.get('instructions') as string)
-        : undefined,
-      imageUrl: formData.get('imageUrl') || undefined,
-      videoUrl: formData.get('videoUrl') || undefined,
-    })
-  );
+  const [validationError, validatedData] = toSync(() => parseUpdateExercise(formData));
 
-  if (validationError || !validatedData) {
-    if (validationError instanceof z.ZodError) {
-      return {
-        error: validationError.issues[0]?.message || 'Invalid form data',
-        fieldErrors: validationError.flatten().fieldErrors,
-      };
-    }
-    return { error: 'Invalid form data' };
-  }
+  const validationErrorResult = handleValidationError(validationError, validatedData);
+  if (validationErrorResult) return validationErrorResult;
+  if (!validatedData) return { error: 'Invalid form data' };
 
-  const [updateError, exercise] = await to(
-    updateExercise(exerciseId, session.user.id, validatedData)
-  );
+  const [updateError, exercise] = await to(updateExercise(exerciseId, session.user.id, validatedData));
 
   if (updateError) {
     console.error('Exercise update error:', updateError);
@@ -135,9 +86,7 @@ export async function updateExerciseAction(
 export async function deleteExerciseAction(exerciseId: string) {
   const [sessionError, session] = await to(requireAuth());
 
-  if (sessionError || !session) {
-    return { error: 'Authentication required' };
-  }
+  if (sessionError || !session) return { error: 'Authentication required' };
 
   const [deleteError] = await to(deleteExercise(exerciseId, session.user.id));
 
@@ -151,13 +100,11 @@ export async function deleteExerciseAction(exerciseId: string) {
 }
 
 export async function searchExercisesAction(params: SearchExercisesInput) {
-  const [validationError, validatedParams] = toSync(() =>
-    searchExercisesSchema.parse(params)
-  );
+  const [validationError, validatedParams] = toSync(() => parseSearchExercises(params));
 
-  if (validationError || !validatedParams) {
-    return { error: 'Invalid search parameters' };
-  }
+  const validationErrorResult = handleValidationError(validationError, validatedParams);
+  if (validationErrorResult) return { error: 'Invalid search parameters' };
+  if (!validatedParams) return { error: 'Invalid search parameters' };
 
   const [searchError, exercises] = await to(searchExercises(validatedParams));
 
@@ -183,9 +130,7 @@ export async function getAllExercisesAction() {
 export async function getUserCustomExercisesAction() {
   const [sessionError, session] = await to(requireAuth());
 
-  if (sessionError || !session) {
-    return { error: 'Authentication required' };
-  }
+  if (sessionError || !session) return { error: 'Authentication required' };
 
   const [error, exercises] = await to(getUserCustomExercises(session.user.id));
 

@@ -16,8 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Gym Tracker',
-  description:
-    'Track your workouts, plan your routines, and achieve your fitness goals.',
+  description: 'Track your workouts, plan your routines, and achieve your fitness goals.',
   keywords: ['gym', 'workout', 'fitness', 'tracker', 'exercise'],
 };
 
@@ -28,9 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background font-sans`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background font-sans`}>
         <Providers>
           {children}
           <Toaster />

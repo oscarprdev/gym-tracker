@@ -46,32 +46,22 @@ export function UserMenu() {
           variant="ghost"
           className="relative h-10 w-10 rounded-full bg-secondary hover:bg-accent transition-colors duration-200"
         >
-          <span className="text-sm font-medium text-secondary-foreground">
-            {initials}
-          </span>
+          <span className="text-sm font-medium text-secondary-foreground">{initials}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
-            </p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => router.push('/profile')}
-        >
+        <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/profile')}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => router.push('/settings')}
-        >
+        <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>

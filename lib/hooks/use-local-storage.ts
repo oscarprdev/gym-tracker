@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 
-export function useLocalStorage<T>(
-  key: string,
-  initialValue: T
-): [T, (value: T | ((prev: T) => T)) => void] {
+export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] {
   // Get value from localStorage on mount
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
@@ -25,8 +22,7 @@ export function useLocalStorage<T>(
   const setValue = (value: T | ((prev: T) => T)) => {
     try {
       // Allow value to be a function so we have the same API as useState
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
 
       if (typeof window !== 'undefined') {

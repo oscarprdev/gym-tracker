@@ -65,9 +65,7 @@ Implement Go-style tuple error handling for cleaner, more maintainable code:
 
 ```typescript
 // lib/utils/error-handler.ts - Error handling utilities
-export async function to<T, E = Error>(
-  promise: Promise<T>
-): Promise<[E | null, T | null]> {
+export async function to<T, E = Error>(promise: Promise<T>): Promise<[E | null, T | null]> {
   try {
     const data = await promise;
     return [null, data];
@@ -103,9 +101,7 @@ export async function loginAction(prevState: any, formData: FormData) {
   const password = formData.get('password') as string;
 
   // Validate form data using Go-style error handling
-  const [validationError, validatedData] = toSync(() =>
-    loginSchema.parse({ email, password })
-  );
+  const [validationError, validatedData] = toSync(() => loginSchema.parse({ email, password }));
 
   if (validationError) {
     if (validationError instanceof z.ZodError) {
@@ -169,9 +165,7 @@ export async function middleware(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
 
   const protectedRoutes = ['/dashboard', '/routines', '/workout'];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const isProtectedRoute = protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
   if (isProtectedRoute && !session) {
     const loginUrl = new URL('/auth/login', request.url);
@@ -364,49 +358,40 @@ export const routinesRelations = relations(routines, ({ one, many }) => ({
   weeklySchedule: many(weeklySchedule),
 }));
 
-export const routineExercisesRelations = relations(
-  routineExercises,
-  ({ one }) => ({
-    routine: one(routines, {
-      fields: [routineExercises.routineId],
-      references: [routines.id],
-    }),
-    exercise: one(exercises, {
-      fields: [routineExercises.exerciseId],
-      references: [exercises.id],
-    }),
-  })
-);
+export const routineExercisesRelations = relations(routineExercises, ({ one }) => ({
+  routine: one(routines, {
+    fields: [routineExercises.routineId],
+    references: [routines.id],
+  }),
+  exercise: one(exercises, {
+    fields: [routineExercises.exerciseId],
+    references: [exercises.id],
+  }),
+}));
 
-export const workoutSessionsRelations = relations(
-  workoutSessions,
-  ({ one, many }) => ({
-    user: one(users, {
-      fields: [workoutSessions.userId],
-      references: [users.id],
-    }),
-    routine: one(routines, {
-      fields: [workoutSessions.routineId],
-      references: [routines.id],
-    }),
-    exerciseLogs: many(exerciseLogs),
-  })
-);
+export const workoutSessionsRelations = relations(workoutSessions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [workoutSessions.userId],
+    references: [users.id],
+  }),
+  routine: one(routines, {
+    fields: [workoutSessions.routineId],
+    references: [routines.id],
+  }),
+  exerciseLogs: many(exerciseLogs),
+}));
 
-export const exerciseLogsRelations = relations(
-  exerciseLogs,
-  ({ one, many }) => ({
-    session: one(workoutSessions, {
-      fields: [exerciseLogs.sessionId],
-      references: [workoutSessions.id],
-    }),
-    exercise: one(exercises, {
-      fields: [exerciseLogs.exerciseId],
-      references: [exercises.id],
-    }),
-    sets: many(setLogs),
-  })
-);
+export const exerciseLogsRelations = relations(exerciseLogs, ({ one, many }) => ({
+  session: one(workoutSessions, {
+    fields: [exerciseLogs.sessionId],
+    references: [workoutSessions.id],
+  }),
+  exercise: one(exercises, {
+    fields: [exerciseLogs.exerciseId],
+    references: [exercises.id],
+  }),
+  sets: many(setLogs),
+}));
 
 export const setLogsRelations = relations(setLogs, ({ one }) => ({
   exerciseLog: one(exerciseLogs, {
@@ -486,12 +471,7 @@ export async function disconnectFromDatabase() {
 ```typescript
 // lib/repositories/routines.ts
 import { db } from '@/lib/db';
-import {
-  routines,
-  routineExercises,
-  exercises,
-  workoutSessions,
-} from '@/lib/db/schema';
+import { routines, routineExercises, exercises, workoutSessions } from '@/lib/db/schema';
 import { eq, and, desc, asc, sql, count } from 'drizzle-orm';
 import type { NewRoutine, Routine } from '@/lib/db/schema';
 
@@ -595,10 +575,7 @@ export class RoutineRepository {
       })
       .from(setLogs)
       .innerJoin(exerciseLogs, eq(setLogs.exerciseLogId, exerciseLogs.id))
-      .innerJoin(
-        workoutSessions,
-        eq(exerciseLogs.sessionId, workoutSessions.id)
-      )
+      .innerJoin(workoutSessions, eq(exerciseLogs.sessionId, workoutSessions.id))
       .where(
         and(
           eq(workoutSessions.userId, userId),
@@ -621,11 +598,7 @@ export class RoutineRepository {
   }
 
   // Update routine
-  async updateRoutine(
-    routineId: string,
-    userId: string,
-    data: Partial<NewRoutine>
-  ) {
+  async updateRoutine(routineId: string, userId: string, data: Partial<NewRoutine>) {
     const [routine] = await db
       .update(routines)
       .set({
@@ -663,12 +636,7 @@ export class RoutineRepository {
 ```typescript
 // lib/repositories/analytics.ts
 import { db } from '@/lib/db';
-import {
-  workoutSessions,
-  exerciseLogs,
-  setLogs,
-  exercises,
-} from '@/lib/db/schema';
+import { workoutSessions, exerciseLogs, setLogs, exercises } from '@/lib/db/schema';
 import { eq, and, gte, sql, desc, asc } from 'drizzle-orm';
 
 export class AnalyticsRepository {
@@ -693,12 +661,7 @@ export class AnalyticsRepository {
         `,
       })
       .from(workoutSessions)
-      .where(
-        and(
-          eq(workoutSessions.userId, userId),
-          gte(workoutSessions.startedAt, startDate)
-        )
-      );
+      .where(and(eq(workoutSessions.userId, userId), gte(workoutSessions.startedAt, startDate)));
   }
 
   // Get muscle group distribution
@@ -715,10 +678,7 @@ export class AnalyticsRepository {
       .from(exercises)
       .innerJoin(exerciseLogs, eq(exercises.id, exerciseLogs.exerciseId))
       .innerJoin(setLogs, eq(exerciseLogs.id, setLogs.exerciseLogId))
-      .innerJoin(
-        workoutSessions,
-        eq(exerciseLogs.sessionId, workoutSessions.id)
-      )
+      .innerJoin(workoutSessions, eq(exerciseLogs.sessionId, workoutSessions.id))
       .where(
         and(
           eq(workoutSessions.userId, userId),
@@ -754,10 +714,7 @@ export class AnalyticsRepository {
       .from(setLogs)
       .innerJoin(exerciseLogs, eq(setLogs.exerciseLogId, exerciseLogs.id))
       .innerJoin(exercises, eq(exerciseLogs.exerciseId, exercises.id))
-      .innerJoin(
-        workoutSessions,
-        eq(exerciseLogs.sessionId, workoutSessions.id)
-      )
+      .innerJoin(workoutSessions, eq(exerciseLogs.sessionId, workoutSessions.id))
       .where(and(...whereConditions))
       .groupBy(exerciseLogs.exerciseId, exercises.name)
       .orderBy(desc(sql`MAX(${setLogs.weight}::numeric)`));
@@ -855,10 +812,7 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async (
-        { user, newEmail, url, token },
-        request
-      ) => {
+      sendChangeEmailVerification: async ({ user, newEmail, url, token }, request) => {
         await sendEmail({
           to: user.email, // Send to current email for security
           subject: 'Approve email change for Gym Tracker',
@@ -906,9 +860,7 @@ export const auth = betterAuth({
       },
       beforeDelete: async (user, request) => {
         // Optional: Log deletion for audit purposes
-        console.log(
-          `User ${user.email} (${user.id}) initiated account deletion`
-        );
+        console.log(`User ${user.email} (${user.id}) initiated account deletion`);
 
         // Optional: Backup user data before deletion
         // await backupUserData(user.id);
@@ -1017,9 +969,7 @@ export async function requireFreshSession() {
 }
 
 // Middleware helper for API routes
-export function withAuth<T extends any[]>(
-  handler: (userId: string, ...args: T) => Promise<any>
-) {
+export function withAuth<T extends any[]>(handler: (userId: string, ...args: T) => Promise<any>) {
   return async (...args: T) => {
     const session = await getSession();
 
@@ -1121,9 +1071,7 @@ export async function logSetAction(prevState: any, formData: FormData) {
       exerciseLogId: formData.get('exerciseLogId'),
       setNumber: Number(formData.get('setNumber')),
       reps: formData.get('reps') ? Number(formData.get('reps')) : undefined,
-      weight: formData.get('weight')
-        ? Number(formData.get('weight'))
-        : undefined,
+      weight: formData.get('weight') ? Number(formData.get('weight')) : undefined,
       isCompleted: formData.get('isCompleted') === 'true',
       isWarmup: formData.get('isWarmup') === 'true',
       rpe: formData.get('rpe') ? Number(formData.get('rpe')) : undefined,
@@ -1157,18 +1105,14 @@ export async function completeWorkoutAction(sessionId: string) {
   try {
     const session = await requireAuth();
 
-    const completedSession = await workoutSessionRepository.completeWorkout(
-      sessionId,
-      session.user.id
-    );
+    const completedSession = await workoutSessionRepository.completeWorkout(sessionId, session.user.id);
 
     revalidatePath('/dashboard');
     revalidatePath('/history');
     redirect('/dashboard?completed=true');
   } catch (error) {
     return {
-      error:
-        error instanceof Error ? error.message : 'Failed to complete workout',
+      error: error instanceof Error ? error.message : 'Failed to complete workout',
     };
   }
 }
@@ -1178,10 +1122,7 @@ export async function deleteWorkoutSessionAction(sessionId: string) {
   try {
     const session = await requireAuth();
 
-    await workoutSessionRepository.deleteWorkoutSession(
-      sessionId,
-      session.user.id
-    );
+    await workoutSessionRepository.deleteWorkoutSession(sessionId, session.user.id);
 
     revalidatePath('/dashboard');
     revalidatePath('/history');
@@ -1189,10 +1130,7 @@ export async function deleteWorkoutSessionAction(sessionId: string) {
     return { success: true };
   } catch (error) {
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to delete workout session',
+      error: error instanceof Error ? error.message : 'Failed to delete workout session',
     };
   }
 }
@@ -1253,9 +1191,7 @@ export async function createRoutineAction(prevState: any, formData: FormData) {
       description: formData.get('description') || undefined,
       isTemplate: formData.get('isTemplate') === 'true',
       color: formData.get('color') || undefined,
-      estimatedDuration: formData.get('estimatedDuration')
-        ? Number(formData.get('estimatedDuration'))
-        : undefined,
+      estimatedDuration: formData.get('estimatedDuration') ? Number(formData.get('estimatedDuration')) : undefined,
       exercises,
     });
 
@@ -1275,18 +1211,13 @@ export async function createRoutineAction(prevState: any, formData: FormData) {
     }
 
     return {
-      error:
-        error instanceof Error ? error.message : 'Failed to create routine',
+      error: error instanceof Error ? error.message : 'Failed to create routine',
     };
   }
 }
 
 // Update routine
-export async function updateRoutineAction(
-  routineId: string,
-  prevState: any,
-  formData: FormData
-) {
+export async function updateRoutineAction(routineId: string, prevState: any, formData: FormData) {
   try {
     const session = await requireAuth();
 
@@ -1294,21 +1225,13 @@ export async function updateRoutineAction(
       name: formData.get('name') as string,
       description: (formData.get('description') as string) || undefined,
       color: (formData.get('color') as string) || undefined,
-      estimatedDuration: formData.get('estimatedDuration')
-        ? Number(formData.get('estimatedDuration'))
-        : undefined,
+      estimatedDuration: formData.get('estimatedDuration') ? Number(formData.get('estimatedDuration')) : undefined,
     };
 
     // Remove undefined values
-    const cleanData = Object.fromEntries(
-      Object.entries(updateData).filter(([_, value]) => value !== undefined)
-    );
+    const cleanData = Object.fromEntries(Object.entries(updateData).filter(([_, value]) => value !== undefined));
 
-    await routineRepository.updateRoutine(
-      routineId,
-      session.user.id,
-      cleanData
-    );
+    await routineRepository.updateRoutine(routineId, session.user.id, cleanData);
 
     revalidatePath('/routines');
     revalidatePath(`/routines/${routineId}`);
@@ -1316,8 +1239,7 @@ export async function updateRoutineAction(
     return { success: true };
   } catch (error) {
     return {
-      error:
-        error instanceof Error ? error.message : 'Failed to update routine',
+      error: error instanceof Error ? error.message : 'Failed to update routine',
     };
   }
 }
@@ -1333,8 +1255,7 @@ export async function deleteRoutineAction(routineId: string) {
     redirect('/routines');
   } catch (error) {
     return {
-      error:
-        error instanceof Error ? error.message : 'Failed to delete routine',
+      error: error instanceof Error ? error.message : 'Failed to delete routine',
     };
   }
 }
@@ -1345,10 +1266,7 @@ export async function cloneRoutineAction(routineId: string) {
     const session = await requireAuth();
 
     // Get original routine with exercises
-    const originalRoutine = await routineRepository.getRoutineWithExercises(
-      routineId,
-      session.user.id
-    );
+    const originalRoutine = await routineRepository.getRoutineWithExercises(routineId, session.user.id);
 
     // Create new routine with copied data
     const newRoutine = await routineRepository.createRoutine({
@@ -1388,11 +1306,7 @@ export class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
 
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    isOperational: boolean = true
-  ) {
+  constructor(message: string, statusCode: number = 500, isOperational: boolean = true) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;

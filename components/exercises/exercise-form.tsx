@@ -8,10 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, X } from 'lucide-react';
-import {
-  createExerciseAction,
-  updateExerciseAction,
-} from '@/app/exercises/actions';
+import { createExerciseAction, updateExerciseAction } from '@/app/exercises/actions';
 import type { Exercise } from '@/lib/db/schema/exercises';
 
 interface ExerciseFormProps {
@@ -49,19 +46,12 @@ const COMMON_EQUIPMENT = [
 
 export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
   const router = useRouter();
-  const [muscleGroups, setMuscleGroups] = useState<string[]>(
-    exercise?.muscleGroups || []
-  );
-  const [instructions, setInstructions] = useState<string[]>(
-    exercise?.instructions || []
-  );
+  const [muscleGroups, setMuscleGroups] = useState<string[]>(exercise?.muscleGroups || []);
+  const [instructions, setInstructions] = useState<string[]>(exercise?.instructions || []);
   const [newMuscleGroup, setNewMuscleGroup] = useState('');
   const [newInstruction, setNewInstruction] = useState('');
 
-  const action =
-    mode === 'create'
-      ? createExerciseAction
-      : updateExerciseAction.bind(null, exercise!.id);
+  const action = mode === 'create' ? createExerciseAction : updateExerciseAction.bind(null, exercise!.id);
 
   const [state, formAction, isPending] = useActionState(action, {
     error: '',
@@ -93,9 +83,7 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>
-          {mode === 'create' ? 'Create New Exercise' : 'Edit Exercise'}
-        </CardTitle>
+        <CardTitle>{mode === 'create' ? 'Create New Exercise' : 'Edit Exercise'}</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-6">
@@ -109,11 +97,7 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
               disabled={isPending}
               className={state.fieldErrors?.name ? 'border-red-500' : ''}
             />
-            {state.fieldErrors?.name && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.name[0]}
-              </p>
-            )}
+            {state.fieldErrors?.name && <p className="text-sm text-red-500">{state.fieldErrors.name[0]}</p>}
           </div>
 
           <div className="space-y-2">
@@ -127,9 +111,7 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
               disabled={isPending}
             />
             {state.fieldErrors?.description && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.description[0]}
-              </p>
+              <p className="text-sm text-red-500">{state.fieldErrors.description[0]}</p>
             )}
           </div>
 
@@ -137,11 +119,7 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
             <Label>Muscle Groups</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {muscleGroups.map((group) => (
-                <Badge
-                  key={group}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
+                <Badge key={group} variant="secondary" className="flex items-center gap-1">
                   {group}
                   <button
                     type="button"
@@ -191,15 +169,9 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
                 </Button>
               ))}
             </div>
-            <input
-              type="hidden"
-              name="muscleGroups"
-              value={JSON.stringify(muscleGroups)}
-            />
+            <input type="hidden" name="muscleGroups" value={JSON.stringify(muscleGroups)} />
             {state.fieldErrors?.muscleGroups && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.muscleGroups[0]}
-              </p>
+              <p className="text-sm text-red-500">{state.fieldErrors.muscleGroups[0]}</p>
             )}
           </div>
 
@@ -218,11 +190,7 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
                 <option key={equipment} value={equipment} />
               ))}
             </datalist>
-            {state.fieldErrors?.equipment && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.equipment[0]}
-              </p>
-            )}
+            {state.fieldErrors?.equipment && <p className="text-sm text-red-500">{state.fieldErrors.equipment[0]}</p>}
           </div>
 
           <div className="space-y-2">
@@ -230,12 +198,8 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
             <div className="space-y-2">
               {instructions.map((instruction, index) => (
                 <div key={index} className="flex items-start gap-2">
-                  <span className="text-sm text-gray-500 mt-2">
-                    {index + 1}.
-                  </span>
-                  <div className="flex-1 p-2 bg-gray-50 rounded border">
-                    {instruction}
-                  </div>
+                  <span className="text-sm text-gray-500 mt-2">{index + 1}.</span>
+                  <div className="flex-1 p-2 bg-gray-50 rounded border">{instruction}</div>
                   <button
                     type="button"
                     onClick={() => removeInstruction(index)}
@@ -269,15 +233,9 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <input
-              type="hidden"
-              name="instructions"
-              value={JSON.stringify(instructions)}
-            />
+            <input type="hidden" name="instructions" value={JSON.stringify(instructions)} />
             {state.fieldErrors?.instructions && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.instructions[0]}
-              </p>
+              <p className="text-sm text-red-500">{state.fieldErrors.instructions[0]}</p>
             )}
           </div>
 
@@ -291,11 +249,7 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
               placeholder="https://example.com/exercise-image.jpg"
               disabled={isPending}
             />
-            {state.fieldErrors?.imageUrl && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.imageUrl[0]}
-              </p>
-            )}
+            {state.fieldErrors?.imageUrl && <p className="text-sm text-red-500">{state.fieldErrors.imageUrl[0]}</p>}
           </div>
 
           <div className="space-y-2">
@@ -308,37 +262,18 @@ export function ExerciseForm({ exercise, mode }: ExerciseFormProps) {
               placeholder="https://youtube.com/watch?v=..."
               disabled={isPending}
             />
-            {state.fieldErrors?.videoUrl && (
-              <p className="text-sm text-red-500">
-                {state.fieldErrors.videoUrl[0]}
-              </p>
-            )}
+            {state.fieldErrors?.videoUrl && <p className="text-sm text-red-500">{state.fieldErrors.videoUrl[0]}</p>}
           </div>
 
           {state.error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {state.error}
-            </div>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{state.error}</div>
           )}
 
           <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={isPending || muscleGroups.length === 0}
-              className="flex-1"
-            >
-              {isPending
-                ? 'Saving...'
-                : mode === 'create'
-                  ? 'Create Exercise'
-                  : 'Update Exercise'}
+            <Button type="submit" disabled={isPending || muscleGroups.length === 0} className="flex-1">
+              {isPending ? 'Saving...' : mode === 'create' ? 'Create Exercise' : 'Update Exercise'}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-              disabled={isPending}
-            >
+            <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending}>
               Cancel
             </Button>
           </div>
