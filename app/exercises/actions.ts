@@ -94,7 +94,7 @@ export async function searchExercisesAction(params: SearchExercisesInput) {
   const [validationError, validatedParams] = toSync(() => parseSearchExercises(params));
 
   const validationErrorResult = handleValidationError(validationError, validatedParams);
-  if (validationErrorResult) return { error: 'Invalid search parameters' };
+  if (validationErrorResult) return validationErrorResult;
   if (!validatedParams) return { error: 'Invalid search parameters' };
 
   const [searchError, exercises] = await to(searchExercises(validatedParams));
