@@ -105,48 +105,52 @@ export const createWeeklyRoutineAction = protectedAction(
     }
 
     // Create workouts for each day
-    for (const workoutData of validatedData.workouts) {
-      const [workoutError, workout] = await to(
-        createWorkout({
-          routineId: routine.id,
-          name: workoutData.name,
-          dayOfWeek: workoutData.dayOfWeek,
-          order: workoutData.dayOfWeek === 0 ? 7 : workoutData.dayOfWeek, // Sunday = 7, Monday = 1, etc.
-        })
-      );
-
-      if (workoutError || !workout) {
-        return { ...DEFAULT_ACTION_STATE, error: 'Failed to create workout' };
-      }
-
-      // Add exercises to the workout
-      for (const exerciseData of workoutData.exercises) {
-        const [exerciseError, workoutExercise] = await to(
-          addExerciseToWorkout({
-            workoutId: workout.id,
-            exerciseId: exerciseData.exerciseId,
-            order: exerciseData.position - 1, // Convert to 0-based index
+    await Promise.all(
+      validatedData.workouts.map(async (workoutData) => {
+        const [workoutError, workout] = await to(
+          createWorkout({
+            routineId: routine.id,
+            name: workoutData.name,
+            dayOfWeek: workoutData.dayOfWeek,
+            order: workoutData.dayOfWeek === 0 ? 7 : workoutData.dayOfWeek, // Sunday = 7, Monday = 1, etc.
           })
         );
 
-        if (exerciseError || !workoutExercise) {
-          return { ...DEFAULT_ACTION_STATE, error: 'Failed to add exercises to workout' };
+        if (workoutError || !workout) {
+          return { ...DEFAULT_ACTION_STATE, error: 'Failed to create workout' };
         }
 
-        // Add sets for this exercise
-        const setsData = exerciseData.sets.map((set) => ({
-          setNumber: set.setNumber,
-          reps: set.reps,
-          weight: set.weight,
-        }));
+        // Add exercises to the workout
+        await Promise.all(
+          workoutData.exercises.map(async (exerciseData) => {
+            const [exerciseError, workoutExercise] = await to(
+              addExerciseToWorkout({
+                workoutId: workout.id,
+                exerciseId: exerciseData.exerciseId,
+                order: exerciseData.position - 1, // Convert to 0-based index
+              })
+            );
 
-        const [setsError] = await to(addSetsToWorkoutExercise(workoutExercise.id, setsData));
+            if (exerciseError || !workoutExercise) {
+              return { ...DEFAULT_ACTION_STATE, error: 'Failed to add exercises to workout' };
+            }
 
-        if (setsError) {
-          return { ...DEFAULT_ACTION_STATE, error: 'Failed to add sets to exercise' };
-        }
-      }
-    }
+            // Add sets for this exercise
+            const setsData = exerciseData.sets.map((set) => ({
+              setNumber: set.setNumber,
+              reps: set.reps,
+              weight: set.weight,
+            }));
+
+            const [setsError] = await to(addSetsToWorkoutExercise(workoutExercise.id, setsData));
+
+            if (setsError) {
+              return { ...DEFAULT_ACTION_STATE, error: 'Failed to add sets to exercise' };
+            }
+          })
+        );
+      })
+    );
 
     redirect('/routines');
   }
