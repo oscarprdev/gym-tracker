@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 
 import { Calendar, Plus, X, Dumbbell, Target, Clock, CalendarDays, GripVertical } from 'lucide-react';
 import { WorkoutBuilder, type WorkoutExerciseConfig } from './workout-builder';
-import { createWeeklyRoutineAction } from '@/app/routines/actions';
+import { createWeeklyRoutineAction } from '@/app/routines/new/actions';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import type { Exercise } from '@/lib/db/schema/exercises';
 

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { requireAuth } from '@/lib/auth/dal';
 import { UserMenu } from '@/components/auth/user-menu';
-import { WeeklyRoutineBuilder } from '@/components/routines/weekly-routine-builder';
+import { WeeklyRoutineBuilder } from '@/components/routines-new/weekly-routine-builder';
 import { getAllExercises } from '@/lib/db/queries/exercises';
 import Link from 'next/link';
 

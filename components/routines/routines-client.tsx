@@ -2,7 +2,7 @@ import { RoutineCard } from './routine-card';
 import { EmptyState } from '@/components/common/empty-state';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { WorkoutBuilder } from './workout-builder';
+import { WorkoutBuilder } from '../routines-new/workout-builder';
 
 import type { Routine } from '@/lib/types';
 import type { Exercise } from '@/lib/db/schema/exercises';
