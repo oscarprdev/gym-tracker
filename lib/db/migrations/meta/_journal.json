@@ -15,6 +15,13 @@
       "when": 1754236802791,
       "tag": "0001_dashing_omega_sentinel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754238775111,
+      "tag": "0002_yellow_gravity",
+      "breakpoints": true
     }
   ]
 }

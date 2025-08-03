@@ -1,18 +1,17 @@
 import { Metadata } from 'next';
 import { requireAuth } from '@/lib/auth/dal';
 import { UserMenu } from '@/components/auth/user-menu';
-import { RoutineBuilderForm } from '@/components/routines/routine-builder-form';
+import { WeeklyRoutineBuilder } from '@/components/routines/weekly-routine-builder';
 import { getAllExercises } from '@/lib/db/queries/exercises';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Create New Routine | Gym Tracker',
-  description: 'Create a new workout routine',
+  description: 'Create a new workout routine with weekly scheduling',
 };
 
 export default async function NewRoutinePage() {
   const session = await requireAuth();
-
   const exercises = await getAllExercises();
 
   return (
@@ -34,7 +33,18 @@ export default async function NewRoutinePage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <RoutineBuilderForm exercises={exercises} userId={session.user.id} />
+        <div className="space-y-6">
+          {/* Page Header */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Create Weekly Routine</h2>
+            <p className="text-gray-600 mt-2">
+              Build your weekly workout routine by creating workouts and assigning them to specific days
+            </p>
+          </div>
+
+          {/* Weekly Routine Builder */}
+          <WeeklyRoutineBuilder exercises={exercises} userId={session.user.id} />
+        </div>
       </main>
     </div>
   );

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, boolean, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, uuid } from 'drizzle-orm/pg-core';
 import { routines } from './routines';
 import { exercises } from './exercises';
 
@@ -37,8 +37,6 @@ export const workoutExerciseSets = pgTable('workout_exercise_sets', {
   setNumber: integer('set_number').notNull(),
   reps: integer('reps'),
   weight: integer('weight').notNull().default(0),
-  restTime: integer('rest_time'), // rest time in seconds
-  isWarmup: boolean('is_warmup').default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
