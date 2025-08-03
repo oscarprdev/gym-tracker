@@ -193,7 +193,7 @@
 - [x] Create exercise management system with CRUD operations
 - [x] Implement exercise templates and categories
 - [x] Create exercise search and filtering functionality
-- [ ] Create routine builder with exercise selection
+- [x] Create routine builder with exercise selection
 - [ ] Implement sets, reps, and weight configuration
 
 ### Stage 4: Routine Planning & Weekly Scheduling

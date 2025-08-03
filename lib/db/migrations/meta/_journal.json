@@ -15,6 +15,13 @@
       "when": 1754149341485,
       "tag": "0001_simplify_exercises_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754204979865,
+      "tag": "0002_update-routineExercises",
+      "breakpoints": true
     }
   ]
 }

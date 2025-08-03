@@ -25,3 +25,39 @@ export type Prettify<T> = {
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+// Routine-related types
+export interface RoutineStats {
+  muscleGroups: string[];
+  totalExercises: number;
+  totalSets: number;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  description?: string | null;
+  estimatedDuration?: number | null;
+  color?: string | null;
+  stats?: RoutineStats;
+}
+
+export interface ExerciseConfig {
+  id: string;
+  exerciseId: string;
+  name: string;
+  muscleGroups: string[];
+  sets: number;
+  reps?: number;
+  repRangeMin?: number;
+  repRangeMax?: number;
+  weight?: number;
+  restTime?: number;
+  notes?: string;
+}
+
+export interface RoutineData {
+  name: string;
+  description: string;
+  estimatedDuration: number | undefined;
+}

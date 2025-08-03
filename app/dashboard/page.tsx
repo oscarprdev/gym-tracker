@@ -1,7 +1,13 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { requireAuth } from '@/lib/auth/dal';
 import { UserMenu } from '@/components/auth/user-menu';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { DashboardRoutines } from '@/components/routines/dashboard-routines';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Dashboard | Gym Tracker',
@@ -78,6 +84,26 @@ export default async function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Routines Section */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">My Routines</h3>
+                <p className="text-gray-600 mt-1">Manage and organize your workout routines</p>
+              </div>
+              <Button asChild>
+                <Link href="/routines/new">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Routine
+                </Link>
+              </Button>
+            </div>
+
+            <Suspense fallback={<LoadingSpinner />}>
+              <DashboardRoutines userId={session.user.id} />
+            </Suspense>
+          </div>
         </div>
       </main>
     </div>

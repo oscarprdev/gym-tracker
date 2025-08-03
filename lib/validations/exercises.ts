@@ -14,7 +14,7 @@ export const createExerciseSchema = z.object({
 
 export const addExerciseToRoutineSchema = z
   .object({
-    exerciseId: z.string().uuid('Invalid exercise ID'),
+    exerciseId: z.uuid('Invalid exercise ID'),
     sets: z.number().min(1, 'Sets must be at least 1').max(20, 'Sets cannot exceed 20'),
     reps: z.number().min(1, 'Reps must be at least 1').max(100, 'Reps cannot exceed 100').optional(),
     repRangeMin: z.number().min(1, 'Min reps must be at least 1').max(100, 'Min reps cannot exceed 100').optional(),

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, decimal, boolean, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, boolean, uuid } from 'drizzle-orm/pg-core';
 import { users } from './auth';
 import { exercises } from './exercises';
 
@@ -27,11 +27,7 @@ export const routineExercises = pgTable('routine_exercises', {
   order: integer('order').notNull(),
   sets: integer('sets').notNull(),
   reps: integer('reps'),
-  repRangeMin: integer('rep_range_min'),
-  repRangeMax: integer('rep_range_max'),
-  weight: decimal('weight', { precision: 5, scale: 2 }),
-  restTime: integer('rest_time'), // in seconds
-  notes: text('notes'),
+  weight: integer('weight'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

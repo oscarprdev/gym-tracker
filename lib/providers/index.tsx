@@ -1,6 +1,5 @@
 'use client';
 
-import { QueryProviders } from './query-provider';
 import { AuthProvider } from './auth-provider';
 
 interface ProvidersProps {
@@ -8,9 +7,5 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
-  return (
-    <QueryProviders>
-      <AuthProvider>{children}</AuthProvider>
-    </QueryProviders>
-  );
+  return <AuthProvider>{children}</AuthProvider>;
 }
