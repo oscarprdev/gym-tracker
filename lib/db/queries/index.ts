@@ -7,5 +7,8 @@ export * from './exercises';
 // Routine queries
 export * from './routines';
 
-// Workout session queries
+// Workout queries
 export * from './workouts';
+
+// Workout session queries
+export * from './workout-sessions';

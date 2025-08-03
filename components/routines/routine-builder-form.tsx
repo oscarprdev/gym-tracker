@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { GripVertical, Plus, X, Dumbbell, Target, Trash2 } from 'lucide-react';
-import { createRoutineWithExercisesAction } from '@/app/routines/actions';
+import { createRoutineWithWorkoutsAction } from '@/app/routines/actions';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { getMuscleGroupColor } from '@/lib/utils/muscle-groups';
 import type { ExerciseConfig, SetConfig } from '@/lib/types';
@@ -39,7 +39,8 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
   const wrappedAction = async (prevState: FormState, formData: FormData): Promise<FormState> => {
     formData.append('exercises', JSON.stringify(selectedExercises));
     formData.append('userId', userId);
-    return await createRoutineWithExercisesAction(prevState, formData);
+    // workoutName is already in the form data from the input field
+    return await createRoutineWithWorkoutsAction(prevState, formData);
   };
 
   const [state, formAction, isPending] = useActionState(wrappedAction, {
@@ -144,8 +145,8 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
       {/* Routine Details Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Routine Details</CardTitle>
-          <CardDescription>Basic information about your routine</CardDescription>
+          <CardTitle>Routine & Workout Details</CardTitle>
+          <CardDescription>Basic information about your routine and first workout</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -162,6 +163,20 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
                 />
                 {'fieldErrors' in state && state.fieldErrors?.name && (
                   <p className="text-sm text-red-500">{state.fieldErrors.name[0]}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="workoutName">Workout Name</Label>
+                <Input
+                  id="workoutName"
+                  name="workoutName"
+                  placeholder="e.g., Push Day"
+                  defaultValue="Workout 1"
+                  disabled={isPending}
+                  className={'fieldErrors' in state && state.fieldErrors?.workoutName ? 'border-red-500' : ''}
+                />
+                {'fieldErrors' in state && state.fieldErrors?.workoutName && (
+                  <p className="text-sm text-red-500">{state.fieldErrors.workoutName[0]}</p>
                 )}
               </div>
             </div>
@@ -189,7 +204,7 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Exercises</CardTitle>
-              <CardDescription>Add and configure exercises for your routine</CardDescription>
+              <CardDescription>Add and configure exercises for your workout</CardDescription>
             </div>
             <Dialog open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
               <DialogTrigger asChild>
@@ -378,7 +393,7 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
       {selectedExercises.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Routine Summary</CardTitle>
+            <CardTitle>Workout Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -405,7 +420,7 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
       {/* Submit Button */}
       <div className="flex justify-end">
         <Button type="submit" disabled={isPending || selectedExercises.length === 0} size="lg">
-          {isPending ? 'Creating...' : 'Create Routine'}
+          {isPending ? 'Creating...' : 'Create Routine & Workout'}
         </Button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 'use server';
 
-import { createRoutine, addExerciseToRoutine, addSetsToRoutineExercise } from '@/lib/db/queries/routines';
+import { createRoutine } from '@/lib/db/queries/routines';
+import { createWorkout, addExerciseToWorkout, addSetsToWorkoutExercise } from '@/lib/db/queries/workouts';
 import { parseCreateRoutine, parseExercisesData } from '@/lib/validations/routines';
 import { to, toSync, handleValidationError, protectedAction } from '@/lib/utils/error-handler';
 import { redirect } from 'next/navigation';
@@ -11,7 +12,7 @@ const DEFAULT_ACTION_STATE = {
   fieldErrors: {},
 };
 
-export const createRoutineWithExercisesAction = protectedAction(
+export const createRoutineWithWorkoutsAction = protectedAction(
   async (session, prevState: { error: string | null; fieldErrors?: Record<string, string[]> }, formData: FormData) => {
     const [validationError, validatedData] = toSync(() => parseCreateRoutine(formData));
     const validationResult = handleValidationError(validationError, validatedData);
@@ -33,19 +34,36 @@ export const createRoutineWithExercisesAction = protectedAction(
       return { ...DEFAULT_ACTION_STATE, ...exercisesValidationResult };
     }
 
+    // Group exercises by workout (for now, create one workout with all exercises)
+    // In the future, this could be enhanced to support multiple workouts
+    const workoutName = (formData.get('workoutName') as string) || 'Workout 1';
+
+    const [workoutError, workout] = await to(
+      createWorkout({
+        routineId: routine.id,
+        name: workoutName,
+        order: 1,
+        description: `Workout for ${routine.name}`,
+      })
+    );
+
+    if (workoutError || !workout) {
+      return { ...DEFAULT_ACTION_STATE, error: 'Failed to create workout' };
+    }
+
     await Promise.all(
       exercises.map(async (exercise: ExerciseConfigInput, index: number) => {
-        const [exerciseError, routineExercise] = await to(
-          addExerciseToRoutine({
-            routineId: routine.id,
+        const [exerciseError, workoutExercise] = await to(
+          addExerciseToWorkout({
+            workoutId: workout.id,
             exerciseId: exercise.exerciseId,
             order: index,
             notes: exercise.notes,
           })
         );
 
-        if (exerciseError || !routineExercise) {
-          return { ...DEFAULT_ACTION_STATE, error: 'Failed to add exercises to routine' };
+        if (exerciseError || !workoutExercise) {
+          return { ...DEFAULT_ACTION_STATE, error: 'Failed to add exercises to workout' };
         }
 
         // Add sets for this exercise
@@ -55,7 +73,7 @@ export const createRoutineWithExercisesAction = protectedAction(
           weight: set.weight,
         }));
 
-        const [setsError] = await to(addSetsToRoutineExercise(routineExercise.id, setsData));
+        const [setsError] = await to(addSetsToWorkoutExercise(workoutExercise.id, setsData));
 
         if (setsError) {
           return { ...DEFAULT_ACTION_STATE, error: 'Failed to add sets to exercise' };

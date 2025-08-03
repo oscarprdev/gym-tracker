@@ -1,12 +1,60 @@
 # Implementation Plan for Gym Tracker
 
+## Business Logic & Data Model
+
+### Core Entities:
+
+1. **Routines** - User-created workout plans that can contain up to 7 workouts
+2. **Workouts** - Individual workout sessions within a routine (max 7 per routine)
+3. **WorkoutExercises** - Exercises within a specific workout
+4. **WorkoutExerciseSets** - Sets for each exercise in a workout
+5. **Exercises** - Exercise templates/catalog
+
+### Entity Relationships:
+
+```
+Routines (1) → (0-7) Workouts
+Workouts (1) → (0-N) WorkoutExercises
+WorkoutExercises (1) → (1-N) WorkoutExerciseSets
+WorkoutExercises (N) → (1) Exercises
+```
+
+### Key Business Rules:
+
+- Every routine can have a maximum of 7 workouts
+- Every workout can have multiple workout exercises
+- Every workout exercise must have at least one workout exercise set
+- Every workout exercise is linked to an exercise from the exercise catalog
+- Workouts can be scheduled on specific days of the week
+- Workout sessions track actual performance during workouts
+
+### Database Schema Structure:
+
+#### Core Tables:
+
+- **routines** - User workout plans
+- **workouts** - Individual workouts within routines (max 7 per routine)
+- **workout_exercises** - Exercises within specific workouts
+- **workout_exercise_sets** - Sets for each exercise in a workout
+- **exercises** - Exercise catalog/templates
+- **workout_sessions** - Actual workout performance tracking
+- **exercise_logs** - Exercise performance during sessions
+- **set_logs** - Set performance during sessions
+
+#### Key Constraints:
+
+- Database constraint ensures maximum 7 workouts per routine
+- Database constraint ensures workout exercises have at least one set
+- Proper foreign key relationships with cascade deletes
+- Indexes for optimal query performance
+
 ## Feature Analysis
 
 ### Identified Features:
 
-1. **Routine Planning & Weekly Scheduling** - Users can create workout routines and assign them to specific days using drag-and-drop functionality
-2. **Daily Routine View (Homepage Preview)** - Homepage shows the scheduled routine for the current day with start/complete actions
-3. **Routine Logging and Historical Records** - Automatic logging of workout sessions with historical comparison capabilities
+1. **Routine Planning & Weekly Scheduling** - Users can create workout routines with up to 7 workouts and assign them to specific days using drag-and-drop functionality
+2. **Daily Routine View (Homepage Preview)** - Homepage shows the scheduled workout for the current day with start/complete actions
+3. **Workout Session Logging and Historical Records** - Automatic logging of workout sessions with historical comparison capabilities
 4. **Last Weight Recall Per Exercise** - Display most recent weight used for each exercise to guide progression
 5. **User Authentication** - Secure user registration and login system
 6. **Exercise Management** - Create, edit, and manage exercise templates
@@ -19,9 +67,9 @@
 
 - **Must-Have Features:**
   - User Authentication
-  - Routine Planning & Weekly Scheduling
-  - Daily Routine View
-  - Routine Logging and Historical Records
+  - Routine Planning & Weekly Scheduling (with 7-workout limit)
+  - Daily Workout View
+  - Workout Session Logging and Historical Records
   - Last Weight Recall Per Exercise
   - Data Persistence
   - Responsive Design
@@ -189,12 +237,18 @@
 
 #### Sub-steps:
 
-- [x] Design and implement core database schema (users, exercises, routines, sessions)
+- [x] Design and implement core database schema (users, exercises, routines, workouts, workoutExercises, workoutExerciseSets, sessions)
 - [x] Create exercise management system with CRUD operations
 - [x] Implement exercise templates and categories
 - [x] Create exercise search and filtering functionality
-- [x] Create routine builder with exercise selection
-- [ ] Implement sets, reps, and weight configuration
+- [x] Refactor database schema to support workout-based structure
+- [x] Update database queries to work with new workout-based structure
+- [x] Update server actions and validation schemas for new workout-based structure
+- [x] Update UI components to work with new workout-based structure
+- [x] Apply database migration to create workout-based structure in Supabase
+- [ ] Create routine builder with workout management (max 7 workouts per routine)
+- [ ] Implement workout exercise assignment and set configuration
+- [ ] Add workout scheduling and day assignment functionality
 
 ### Stage 4: Routine Planning & Weekly Scheduling
 
@@ -203,31 +257,34 @@
 
 #### Sub-steps:
 
-- [ ] Add routine templates and cloning functionality
+- [ ] Create routine builder with workout limit enforcement (max 7 workouts)
+- [ ] Add workout templates and cloning functionality
 - [ ] Create routine validation and error handling
-- [ ] Implement routine scheduling logic
+- [ ] Implement workout scheduling logic with day assignment
 - [ ] Add routine sharing and copying features
 - [ ] Set up optimistic updates for routine changes
 - [ ] Test drag-and-drop functionality across devices
+- [ ] Implement workout reordering within routines
 
-### Stage 5: Daily Routine View & Session Management
+### Stage 5: Daily Workout View & Session Management
 
 **Duration:** 2-3 weeks
 **Dependencies:** Stage 4 completion
 
 #### Sub-steps:
 
-- [ ] Create homepage with today's routine display
+- [ ] Create homepage with today's scheduled workout display
 - [ ] Implement "Start Workout" session mode
-- [ ] Build exercise cards with expand/collapse functionality
-- [ ] Implement weekly calendar/planner UI component
-- [ ] Set up drag-and-drop functionality with framer-motion
+- [ ] Build workout exercise cards with expand/collapse functionality
+- [ ] Implement weekly calendar/planner UI component showing scheduled workouts
+- [ ] Set up drag-and-drop functionality with framer-motion for workout scheduling
 - [ ] Implement rest timers and workout duration tracking
 - [ ] Create session progress indicators and animations
 - [ ] Add workout completion and summary screens
 - [ ] Implement session pause/resume functionality
 - [ ] Set up workout notes and feedback system
-- [ ] Add empty state handling for days without routines
+- [ ] Add empty state handling for days without scheduled workouts
+- [ ] Implement workout exercise set tracking and logging
 
 ### Stage 6: Historical Records & Progress Tracking
 
@@ -236,16 +293,17 @@
 
 #### Sub-steps:
 
-- [ ] Implement workout history storage and retrieval
-- [ ] Create history view with filtering and sorting
-- [ ] Build last weight recall system for exercises
-- [ ] Implement performance comparison and progress tracking
+- [ ] Implement workout session history storage and retrieval
+- [ ] Create history view with filtering and sorting by routine/workout
+- [ ] Build last weight recall system for exercises across workout sessions
+- [ ] Implement performance comparison and progress tracking per exercise
 - [ ] Add workout statistics and analytics
 - [ ] Create progress charts and visualizations
 - [ ] Implement data export functionality
 - [ ] Add workout streak tracking
 - [ ] Set up progress photos and measurements
-- [ ] Create personal records (PR) tracking
+- [ ] Create personal records (PR) tracking per exercise
+- [ ] Implement routine completion tracking and statistics
 
 ### Stage 7: Advanced Features & Performance
 

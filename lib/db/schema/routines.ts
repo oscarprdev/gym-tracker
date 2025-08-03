@@ -1,6 +1,5 @@
 import { pgTable, text, timestamp, integer, boolean, uuid } from 'drizzle-orm/pg-core';
 import { users } from './auth';
-import { exercises } from './exercises';
 
 export const routines = pgTable('routines', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -16,31 +15,7 @@ export const routines = pgTable('routines', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const routineExercises = pgTable('routine_exercises', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  routineId: uuid('routine_id')
-    .notNull()
-    .references(() => routines.id, { onDelete: 'cascade' }),
-  exerciseId: uuid('exercise_id')
-    .notNull()
-    .references(() => exercises.id, { onDelete: 'cascade' }),
-  order: integer('order').notNull(),
-  notes: text('notes'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-export const routineExerciseSets = pgTable('routine_exercise_sets', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  routineExerciseId: uuid('routine_exercise_id')
-    .notNull()
-    .references(() => routineExercises.id, { onDelete: 'cascade' }),
-  setNumber: integer('set_number').notNull(),
-  reps: integer('reps'),
-  weight: integer('weight').notNull().default(0),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// Weekly schedule table for routine scheduling
+// Weekly schedule table for routine scheduling (kept for backward compatibility)
 export const weeklySchedule = pgTable('weekly_schedule', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('user_id')
@@ -58,9 +33,5 @@ export const weeklySchedule = pgTable('weekly_schedule', {
 
 export type Routine = typeof routines.$inferSelect;
 export type NewRoutine = typeof routines.$inferInsert;
-export type RoutineExercise = typeof routineExercises.$inferSelect;
-export type NewRoutineExercise = typeof routineExercises.$inferInsert;
-export type RoutineExerciseSet = typeof routineExerciseSets.$inferSelect;
-export type NewRoutineExerciseSet = typeof routineExerciseSets.$inferInsert;
 export type WeeklySchedule = typeof weeklySchedule.$inferSelect;
 export type NewWeeklySchedule = typeof weeklySchedule.$inferInsert;

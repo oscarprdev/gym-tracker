@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, integer, decimal, boolean, uuid } from 'drizzle-orm/pg-core';
 import { users } from './auth';
-import { routines } from './routines';
+import { workouts } from './workouts';
 import { exercises } from './exercises';
 
 export const workoutSessions = pgTable('workout_sessions', {
@@ -8,7 +8,7 @@ export const workoutSessions = pgTable('workout_sessions', {
   userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  routineId: uuid('routine_id').references(() => routines.id, {
+  workoutId: uuid('workout_id').references(() => workouts.id, {
     onDelete: 'set null',
   }),
   name: text('name').notNull(),

@@ -12,7 +12,7 @@ export const createExerciseSchema = z.object({
     .refine((groups) => groups.every((group) => group.trim().length > 0), 'Muscle groups cannot be empty'),
 });
 
-export const addExerciseToRoutineSchema = z
+export const addExerciseToWorkoutSchema = z
   .object({
     exerciseId: z.uuid('Invalid exercise ID'),
     sets: z.number().min(1, 'Sets must be at least 1').max(20, 'Sets cannot exceed 20'),
@@ -51,7 +51,7 @@ export const searchExercisesSchema = z.object({
 });
 
 export type CreateExerciseInput = z.infer<typeof createExerciseSchema>;
-export type AddExerciseToRoutineInput = z.infer<typeof addExerciseToRoutineSchema>;
+export type AddExerciseToWorkoutInput = z.infer<typeof addExerciseToWorkoutSchema>;
 export type UpdateExerciseInput = z.infer<typeof updateExerciseSchema>;
 export type SearchExercisesInput = z.infer<typeof searchExercisesSchema>;
 
@@ -70,8 +70,8 @@ export function parseUpdateExercise(formData: FormData): UpdateExerciseInput {
   });
 }
 
-export function parseAddExerciseToRoutine(formData: FormData): AddExerciseToRoutineInput {
-  return addExerciseToRoutineSchema.parse({
+export function parseAddExerciseToWorkout(formData: FormData): AddExerciseToWorkoutInput {
+  return addExerciseToWorkoutSchema.parse({
     exerciseId: formData.get('exerciseId'),
     sets: Number(formData.get('sets')),
     reps: formData.get('reps') ? Number(formData.get('reps')) : undefined,
