@@ -43,7 +43,6 @@ export const createRoutineWithWorkoutsAction = protectedAction(
         routineId: routine.id,
         name: workoutName,
         order: 1,
-        description: `Workout for ${routine.name}`,
       })
     );
 
@@ -58,7 +57,6 @@ export const createRoutineWithWorkoutsAction = protectedAction(
             workoutId: workout.id,
             exerciseId: exercise.exerciseId,
             order: index,
-            notes: exercise.notes,
           })
         );
 
@@ -99,7 +97,6 @@ export const createWeeklyRoutineAction = protectedAction(
       createRoutine({
         userId: session.user.id,
         name: validatedData.name,
-        description: validatedData.description,
       })
     );
 
@@ -113,7 +110,6 @@ export const createWeeklyRoutineAction = protectedAction(
         createWorkout({
           routineId: routine.id,
           name: workoutData.name,
-          description: workoutData.description,
           dayOfWeek: workoutData.dayOfWeek,
           order: workoutData.dayOfWeek === 0 ? 7 : workoutData.dayOfWeek, // Sunday = 7, Monday = 1, etc.
         })
@@ -130,7 +126,6 @@ export const createWeeklyRoutineAction = protectedAction(
             workoutId: workout.id,
             exerciseId: exerciseData.exerciseId,
             order: exerciseData.position - 1, // Convert to 0-based index
-            notes: exerciseData.notes,
           })
         );
 

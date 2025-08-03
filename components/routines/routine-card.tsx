@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dumbbell, Target } from 'lucide-react';
@@ -17,9 +17,6 @@ export function RoutineCard({ routine }: RoutineCardProps) {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg font-semibold text-gray-900">{routine.name}</CardTitle>
-            {routine.description && (
-              <CardDescription className="mt-1 text-sm text-gray-600">{routine.description}</CardDescription>
-            )}
           </div>
           {routine.color && (
             <div className="w-4 h-4 rounded-full ml-2 flex-shrink-0" style={{ backgroundColor: routine.color }} />

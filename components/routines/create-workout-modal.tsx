@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -27,7 +26,6 @@ export interface WorkoutExerciseConfig {
   muscleGroups: string[];
   position: number;
   sets: WorkoutSetConfig[];
-  notes?: string;
 }
 
 export interface WorkoutSetConfig {
@@ -39,14 +37,13 @@ export interface WorkoutSetConfig {
 
 interface CreateWorkoutModalProps {
   exercises: Exercise[];
-  onWorkoutCreated: (workout: { name: string; description?: string; exercises: WorkoutExerciseConfig[] }) => void;
+  onWorkoutCreated: (workout: { name: string; exercises: WorkoutExerciseConfig[] }) => void;
   trigger?: React.ReactNode;
 }
 
 export function CreateWorkoutModal({ exercises, onWorkoutCreated, trigger }: CreateWorkoutModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [workoutName, setWorkoutName] = useState('');
-  const [workoutDescription, setWorkoutDescription] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<WorkoutExerciseConfig[]>([]);
   const [isExerciseDialogOpen, setIsExerciseDialogOpen] = useState(false);
   const [expandedExercises, setExpandedExercises] = useState<Set<string>>(new Set());
@@ -68,17 +65,10 @@ export function CreateWorkoutModal({ exercises, onWorkoutCreated, trigger }: Cre
       muscleGroups: exercise.muscleGroups,
       position: selectedExercises.length + 1,
       sets: createDefaultSets(3),
-      notes: '',
     };
 
     setSelectedExercises((prev) => [...prev, newExercise]);
     setIsExerciseDialogOpen(false);
-  };
-
-  const updateExercise = (id: string, updates: Partial<WorkoutExerciseConfig>) => {
-    setSelectedExercises((prev) =>
-      prev.map((exercise) => (exercise.id === id ? { ...exercise, ...updates } : exercise))
-    );
   };
 
   const updateSet = (exerciseId: string, setId: string, updates: Partial<WorkoutSetConfig>) => {
@@ -174,13 +164,11 @@ export function CreateWorkoutModal({ exercises, onWorkoutCreated, trigger }: Cre
 
     onWorkoutCreated({
       name: workoutName,
-      description: workoutDescription,
       exercises: selectedExercises,
     });
 
     // Reset form
     setWorkoutName('');
-    setWorkoutDescription('');
     setSelectedExercises([]);
     setExpandedExercises(new Set());
     setIsOpen(false);
@@ -191,7 +179,6 @@ export function CreateWorkoutModal({ exercises, onWorkoutCreated, trigger }: Cre
     if (!open) {
       // Reset form when closing
       setWorkoutName('');
-      setWorkoutDescription('');
       setSelectedExercises([]);
       setExpandedExercises(new Set());
     }
@@ -232,16 +219,6 @@ export function CreateWorkoutModal({ exercises, onWorkoutCreated, trigger }: Cre
                     onChange={(e) => setWorkoutName(e.target.value)}
                     placeholder="e.g., Push Day, Upper Body"
                     required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="workoutDescription">Description (optional)</Label>
-                  <Textarea
-                    id="workoutDescription"
-                    value={workoutDescription}
-                    onChange={(e) => setWorkoutDescription(e.target.value)}
-                    placeholder="Describe your workout..."
-                    rows={3}
                   />
                 </div>
               </div>
@@ -434,18 +411,6 @@ export function CreateWorkoutModal({ exercises, onWorkoutCreated, trigger }: Cre
                                           </div>
                                         </div>
                                       )}
-
-                                      {/* Notes */}
-                                      <div className="mt-4">
-                                        <Label className="text-xs text-gray-600">Notes (optional)</Label>
-                                        <Textarea
-                                          value={exercise.notes || ''}
-                                          onChange={(e) => updateExercise(exercise.id, { notes: e.target.value })}
-                                          placeholder="Add notes for this exercise..."
-                                          rows={2}
-                                          className="mt-1"
-                                        />
-                                      </div>
                                     </CardContent>
                                   </Card>
                                 </div>

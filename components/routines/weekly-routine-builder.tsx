@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+
 import { Calendar, Plus, X, Dumbbell, Target, Clock, CalendarDays, GripVertical } from 'lucide-react';
 import { CreateWorkoutModal, type WorkoutExerciseConfig } from './create-workout-modal';
 import { createWeeklyRoutineAction } from '@/app/routines/actions';
@@ -15,7 +15,6 @@ import type { Exercise } from '@/lib/db/schema/exercises';
 export interface WeeklyWorkout {
   id: string;
   name: string;
-  description?: string;
   dayOfWeek: number; // 0 = Sunday, 1 = Monday, etc.
   exercises: WorkoutExerciseConfig[];
 }
@@ -42,7 +41,6 @@ const DAYS_OF_WEEK = [
 
 export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRoutineBuilderProps) {
   const [routineName, setRoutineName] = useState('');
-  const [routineDescription, setRoutineDescription] = useState('');
   const [weeklyWorkouts, setWeeklyWorkouts] = useState<WeeklyWorkout[]>([]);
 
   const wrappedAction = async (prevState: FormState, formData: FormData): Promise<FormState> => {
@@ -50,7 +48,6 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
       'routineData',
       JSON.stringify({
         name: routineName,
-        description: routineDescription,
         workouts: weeklyWorkouts,
       })
     );
@@ -62,11 +59,7 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
     fieldErrors: {},
   });
 
-  const handleWorkoutCreated = (workout: {
-    name: string;
-    description?: string;
-    exercises: WorkoutExerciseConfig[];
-  }) => {
+  const handleWorkoutCreated = (workout: { name: string; exercises: WorkoutExerciseConfig[] }) => {
     // Find the next available day
     const usedDays = weeklyWorkouts.map((w) => w.dayOfWeek);
     let nextDay = 1; // Start with Monday
@@ -83,7 +76,6 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
     const newWorkout: WeeklyWorkout = {
       id: `${Date.now()}-${Math.random()}`,
       name: workout.name,
-      description: workout.description,
       dayOfWeek: nextDay,
       exercises: workout.exercises,
     };
@@ -174,21 +166,6 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
               />
               {'fieldErrors' in state && state.fieldErrors?.name && (
                 <p className="text-sm text-red-500">{state.fieldErrors.name[0]}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="routineDescription">Description (optional)</Label>
-              <Textarea
-                id="routineDescription"
-                value={routineDescription}
-                onChange={(e) => setRoutineDescription(e.target.value)}
-                placeholder="Describe your routine..."
-                rows={3}
-                disabled={isPending}
-                className={'fieldErrors' in state && state.fieldErrors?.description ? 'border-red-500' : ''}
-              />
-              {'fieldErrors' in state && state.fieldErrors?.description && (
-                <p className="text-sm text-red-500">{state.fieldErrors.description[0]}</p>
               )}
             </div>
           </div>
@@ -295,11 +272,7 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
                                               <h4 className="font-medium text-sm truncate">{workout.name}</h4>
                                             </div>
 
-                                            {workout.description && (
-                                              <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                                                {workout.description}
-                                              </p>
-                                            )}
+                                            {/* Removed workout.description */}
 
                                             <div className="flex items-center gap-3 text-xs text-gray-500">
                                               <div className="flex items-center gap-1">

@@ -4,7 +4,6 @@ import { authIdSchema } from './auth';
 export const createRoutineSchema = z.object({
   userId: authIdSchema,
   name: z.string().min(1, 'Routine name is required').max(100, 'Routine name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
 });
 
 export const updateRoutineSchema = createRoutineSchema.partial();
@@ -13,7 +12,6 @@ export const updateRoutineSchema = createRoutineSchema.partial();
 export const createWorkoutSchema = z.object({
   routineId: z.uuid('Invalid routine ID'),
   name: z.string().min(1, 'Workout name is required').max(100, 'Workout name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
   dayOfWeek: z.number().min(0).max(6).optional(), // 0 = Sunday, 6 = Saturday
   order: z.number().min(1, 'Order must be at least 1').max(7, 'Order cannot exceed 7'),
   estimatedDuration: z
@@ -30,13 +28,11 @@ export const addExerciseToWorkoutSchema = z.object({
   workoutId: z.uuid('Invalid workout ID'),
   exerciseId: z.uuid('Invalid exercise ID'),
   order: z.number().min(0, 'Order must be non-negative'),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 
 export const updateWorkoutExerciseSchema = z.object({
   id: z.uuid('Invalid workout exercise ID'),
   order: z.number().min(0, 'Order must be non-negative').optional(),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 
 // Set schemas
@@ -52,7 +48,6 @@ export const setConfigSchema = z.object({
 export const workoutExerciseSchema = z.object({
   exerciseId: z.uuid('Invalid exercise ID'),
   sets: z.array(setConfigSchema).min(1, 'At least 1 set is required').max(50, 'Maximum 50 sets allowed'),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 
 export const exerciseConfigSchema = z.object({
@@ -61,7 +56,6 @@ export const exerciseConfigSchema = z.object({
   name: z.string().min(1, 'Exercise name is required'),
   muscleGroups: z.array(z.string()).min(1, 'At least one muscle group is required'),
   sets: z.array(setConfigSchema).min(1, 'At least 1 set is required').max(50, 'Maximum 50 sets allowed'),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 
 export const exercisesArraySchema = z.array(exerciseConfigSchema).min(1, 'At least one exercise is required');
@@ -81,20 +75,17 @@ export const workoutExerciseConfigSchema = z.object({
   muscleGroups: z.array(z.string()).min(1, 'At least one muscle group is required'),
   position: z.number().min(1, 'Position must be at least 1'),
   sets: z.array(workoutSetConfigSchema).min(1, 'At least 1 set is required').max(50, 'Maximum 50 sets allowed'),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 
 export const weeklyWorkoutSchema = z.object({
   id: z.string().min(1, 'Workout ID is required'),
   name: z.string().min(1, 'Workout name is required').max(100, 'Workout name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
   dayOfWeek: z.number().min(0).max(6, 'Day of week must be between 0 and 6'), // 0 = Sunday, 1 = Monday, etc.
   exercises: z.array(workoutExerciseConfigSchema).min(1, 'At least one exercise is required'),
 });
 
 export const weeklyRoutineSchema = z.object({
   name: z.string().min(1, 'Routine name is required').max(100, 'Routine name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
   workouts: z
     .array(weeklyWorkoutSchema)
     .min(1, 'At least one workout is required')
@@ -154,7 +145,6 @@ export function parseCreateRoutine(formData: FormData): CreateRoutineInput {
   return createRoutineSchema.parse({
     userId: formData.get('userId'),
     name: formData.get('name'),
-    description: formData.get('description') || undefined,
   });
 }
 
@@ -162,7 +152,6 @@ export function parseCreateWorkout(formData: FormData): CreateWorkoutInput {
   return createWorkoutSchema.parse({
     routineId: formData.get('routineId'),
     name: formData.get('name'),
-    description: formData.get('description') || undefined,
     dayOfWeek: formData.get('dayOfWeek') ? Number(formData.get('dayOfWeek')) : undefined,
     order: Number(formData.get('order')),
     estimatedDuration: formData.get('estimatedDuration') ? Number(formData.get('estimatedDuration')) : undefined,

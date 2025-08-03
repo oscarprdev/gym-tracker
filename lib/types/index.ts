@@ -36,7 +36,6 @@ export interface RoutineStats {
 export interface Routine {
   id: string;
   name: string;
-  description?: string | null;
   estimatedDuration?: number | null;
   color?: string | null;
   stats?: RoutineStats;
@@ -55,7 +54,6 @@ export interface ExerciseConfig {
   name: string;
   muscleGroups: string[];
   sets: SetConfig[];
-  notes?: string;
 }
 
 export interface RoutineData {

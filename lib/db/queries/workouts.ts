@@ -22,7 +22,6 @@ export async function getWorkoutWithExercises(workoutId: string) {
     .select({
       id: workoutExercises.id,
       order: workoutExercises.order,
-      notes: workoutExercises.notes,
       exercise: {
         id: exercises.id,
         name: exercises.name,

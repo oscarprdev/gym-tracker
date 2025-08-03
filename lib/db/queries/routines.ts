@@ -23,7 +23,6 @@ export async function getRoutineWithWorkouts(routineId: string) {
     .select({
       id: workouts.id,
       name: workouts.name,
-      description: workouts.description,
       dayOfWeek: workouts.dayOfWeek,
       order: workouts.order,
       estimatedDuration: workouts.estimatedDuration,
@@ -39,7 +38,6 @@ export async function getRoutineWithWorkouts(routineId: string) {
         .select({
           id: workoutExercises.id,
           order: workoutExercises.order,
-          notes: workoutExercises.notes,
           exercise: {
             id: exercises.id,
             name: exercises.name,
@@ -85,13 +83,12 @@ export async function getRoutineWithWorkouts(routineId: string) {
   };
 }
 
-export async function createRoutine(data: { userId: string; name: string; description?: string }) {
+export async function createRoutine(data: { userId: string; name: string }) {
   const result = await db
     .insert(routines)
     .values({
       userId: data.userId,
       name: data.name,
-      description: data.description,
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -104,7 +101,6 @@ export async function updateRoutine(
   id: string,
   data: {
     name?: string;
-    description?: string;
     isTemplate?: boolean;
     color?: string;
     estimatedDuration?: number;

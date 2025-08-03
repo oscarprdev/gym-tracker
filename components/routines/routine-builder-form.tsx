@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -64,17 +64,10 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
       name: exercise.name,
       muscleGroups: exercise.muscleGroups,
       sets: createDefaultSets(3),
-      notes: '',
     };
 
     setSelectedExercises((prev) => [...prev, newExercise]);
     setIsExerciseDialogOpen(false);
-  };
-
-  const updateExercise = (id: string, updates: Partial<ExerciseConfig>) => {
-    setSelectedExercises((prev) =>
-      prev.map((exercise) => (exercise.id === id ? { ...exercise, ...updates } : exercise))
-    );
   };
 
   const updateSet = (exerciseId: string, setId: string, updates: Partial<SetConfig>) => {
@@ -179,20 +172,6 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
                   <p className="text-sm text-red-500">{state.fieldErrors.workoutName[0]}</p>
                 )}
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Describe your routine..."
-                rows={3}
-                disabled={isPending}
-                className={'fieldErrors' in state && state.fieldErrors?.description ? 'border-red-500' : ''}
-              />
-              {'fieldErrors' in state && state.fieldErrors?.description && (
-                <p className="text-sm text-red-500">{state.fieldErrors.description[0]}</p>
-              )}
             </div>
           </div>
         </CardContent>
@@ -360,19 +339,6 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
                                       </div>
                                     ))}
                                   </div>
-                                </div>
-
-                                {/* Notes */}
-                                <div className="mt-4">
-                                  <Label className="text-xs text-gray-600">Notes (optional)</Label>
-                                  <Textarea
-                                    value={exercise.notes || ''}
-                                    onChange={(e) => updateExercise(exercise.id, { notes: e.target.value })}
-                                    placeholder="Add notes for this exercise..."
-                                    rows={2}
-                                    className="mt-1"
-                                    disabled={isPending}
-                                  />
                                 </div>
                               </div>
                             </div>
