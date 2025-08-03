@@ -42,16 +42,19 @@ export interface Routine {
   stats?: RoutineStats;
 }
 
+export interface SetConfig {
+  id: string;
+  setNumber: number;
+  reps?: number;
+  weight: number;
+}
+
 export interface ExerciseConfig {
   id: string;
   exerciseId: string;
   name: string;
   muscleGroups: string[];
-  sets: number;
-  reps?: number;
-  repRangeMin?: number;
-  repRangeMax?: number;
-  weight: number;
+  sets: SetConfig[];
   notes?: string;
 }
 

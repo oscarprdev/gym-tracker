@@ -18,8 +18,6 @@ export const verifySession = cache(async () => {
     headers: await headers(),
   });
 
-  console.log('session', session);
-
   if (!session) {
     return null;
   }

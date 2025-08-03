@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { users } from './auth';
 import { exercises } from './exercises';
-import { routines, routineExercises, weeklySchedule } from './routines';
+import { routines, routineExercises, routineExerciseSets, weeklySchedule } from './routines';
 import { workoutSessions, exerciseLogs, setLogs } from './workout-sessions';
 
 // User relations
@@ -33,7 +33,7 @@ export const routinesRelations = relations(routines, ({ one, many }) => ({
   weeklySchedule: many(weeklySchedule),
 }));
 
-export const routineExercisesRelations = relations(routineExercises, ({ one }) => ({
+export const routineExercisesRelations = relations(routineExercises, ({ one, many }) => ({
   routine: one(routines, {
     fields: [routineExercises.routineId],
     references: [routines.id],
@@ -41,6 +41,14 @@ export const routineExercisesRelations = relations(routineExercises, ({ one }) =
   exercise: one(exercises, {
     fields: [routineExercises.exerciseId],
     references: [exercises.id],
+  }),
+  sets: many(routineExerciseSets),
+}));
+
+export const routineExerciseSetsRelations = relations(routineExerciseSets, ({ one }) => ({
+  routineExercise: one(routineExercises, {
+    fields: [routineExerciseSets.routineExerciseId],
+    references: [routineExercises.id],
   }),
 }));
 

@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1754127564493,
-      "tag": "0000_clean_better_auth_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1754149341485,
-      "tag": "0001_simplify_exercises_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1754204979865,
-      "tag": "0002_update-routineExercises",
+      "when": 1754209199084,
+      "tag": "0000_closed_marvel_apes",
       "breakpoints": true
     }
   ]

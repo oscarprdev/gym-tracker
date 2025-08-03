@@ -1,5 +1,5 @@
 import { db } from '../client';
-import { routines, routineExercises } from '../schema/routines';
+import { routines, routineExercises, routineExerciseSets } from '../schema/routines';
 import { exercises } from '../schema/exercises';
 import { eq, desc, asc } from 'drizzle-orm';
 import { to } from '@/lib/utils';
@@ -22,9 +22,7 @@ export async function getRoutineWithExercises(routineId: string) {
     .select({
       id: routineExercises.id,
       order: routineExercises.order,
-      sets: routineExercises.sets,
-      reps: routineExercises.reps,
-      weight: routineExercises.weight,
+      notes: routineExercises.notes,
       exercise: {
         id: exercises.id,
         name: exercises.name,
@@ -36,9 +34,30 @@ export async function getRoutineWithExercises(routineId: string) {
     .where(eq(routineExercises.routineId, routineId))
     .orderBy(asc(routineExercises.order));
 
+  // Fetch sets for each exercise
+  const exercisesWithSets = await Promise.all(
+    routineExercisesData.map(async (routineExercise) => {
+      const sets = await db
+        .select({
+          id: routineExerciseSets.id,
+          setNumber: routineExerciseSets.setNumber,
+          reps: routineExerciseSets.reps,
+          weight: routineExerciseSets.weight,
+        })
+        .from(routineExerciseSets)
+        .where(eq(routineExerciseSets.routineExerciseId, routineExercise.id))
+        .orderBy(asc(routineExerciseSets.setNumber));
+
+      return {
+        ...routineExercise,
+        sets,
+      };
+    })
+  );
+
   return {
     ...routine,
-    exercises: routineExercisesData,
+    exercises: exercisesWithSets,
   };
 }
 
@@ -87,27 +106,33 @@ export async function addExerciseToRoutine(data: {
   routineId: string;
   exerciseId: string;
   order: number;
-  sets: number;
-  reps: number;
-  repRangeMin: number;
-  repRangeMax: number;
-  weight: number;
-  notes: string;
+  notes?: string;
 }) {
   const result = await db.insert(routineExercises).values(data).returning();
 
   return result[0];
 }
 
+export async function addSetsToRoutineExercise(
+  routineExerciseId: string,
+  sets: Array<{ setNumber: number; reps?: number; weight: number }>
+) {
+  const setsData = sets.map((set) => ({
+    routineExerciseId,
+    setNumber: set.setNumber,
+    reps: set.reps,
+    weight: set.weight,
+  }));
+
+  const result = await db.insert(routineExerciseSets).values(setsData).returning();
+
+  return result;
+}
+
 export async function updateRoutineExercise(
   id: string,
   data: {
     order?: number;
-    sets?: number;
-    reps?: number;
-    repRangeMin?: number;
-    repRangeMax?: number;
-    weight?: number;
     notes?: string;
   }
 ) {
@@ -116,8 +141,24 @@ export async function updateRoutineExercise(
   return result[0];
 }
 
+export async function updateRoutineExerciseSet(
+  id: string,
+  data: {
+    reps?: number;
+    weight?: number;
+  }
+) {
+  const result = await db.update(routineExerciseSets).set(data).where(eq(routineExerciseSets.id, id)).returning();
+
+  return result[0];
+}
+
 export async function removeExerciseFromRoutine(id: string) {
   await db.delete(routineExercises).where(eq(routineExercises.id, id));
+}
+
+export async function removeSetFromRoutineExercise(id: string) {
+  await db.delete(routineExerciseSets).where(eq(routineExerciseSets.id, id));
 }
 
 export async function reorderRoutineExercises(routineId: string, exerciseOrders: { id: string; order: number }[]) {
@@ -133,10 +174,11 @@ export async function getRoutineStats(routineId: string) {
     db
       .select({
         muscleGroups: exercises.muscleGroups,
-        sets: routineExercises.sets,
+        setsCount: routineExerciseSets.id,
       })
       .from(routineExercises)
       .innerJoin(exercises, eq(routineExercises.exerciseId, exercises.id))
+      .leftJoin(routineExerciseSets, eq(routineExercises.id, routineExerciseSets.routineExerciseId))
       .where(eq(routineExercises.routineId, routineId))
   );
 
@@ -159,12 +201,14 @@ export async function getRoutineStats(routineId: string) {
         }
       });
     }
-    totalSets += exercise.sets || 0;
+    if (exercise.setsCount) {
+      totalSets++;
+    }
   });
 
   return {
     muscleGroups: Array.from(muscleGroups).sort(),
-    totalExercises: data.length,
+    totalExercises: new Set(data.map((ex) => ex.muscleGroups)).size,
     totalSets,
   };
 }

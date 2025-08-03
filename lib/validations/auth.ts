@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+export const authIdSchema = z
+  .string()
+  .length(32)
+  .regex(/^[a-zA-Z0-9_-]+$/, {
+    message: 'Invalid Auth ID format',
+  });
+
 export const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required').min(6, 'Password must be at least 6 characters'),

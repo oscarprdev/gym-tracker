@@ -15,11 +15,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { GripVertical, Plus, X, Dumbbell, Target } from 'lucide-react';
+import { GripVertical, Plus, X, Dumbbell, Target, Trash2 } from 'lucide-react';
 import { createRoutineWithExercisesAction } from '@/app/routines/actions';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { getMuscleGroupColor } from '@/lib/utils/muscle-groups';
-import type { ExerciseConfig } from '@/lib/types';
+import type { ExerciseConfig, SetConfig } from '@/lib/types';
 import type { Exercise } from '@/lib/db/schema/exercises';
 
 type FormState = {
@@ -47,15 +47,23 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
     fieldErrors: {},
   });
 
+  const createDefaultSets = (count: number): SetConfig[] => {
+    return Array.from({ length: count }, (_, index) => ({
+      id: `${Date.now()}-${Math.random()}-${index}`,
+      setNumber: index + 1,
+      reps: 10,
+      weight: 0,
+    }));
+  };
+
   const addExercise = (exercise: Exercise) => {
     const newExercise: ExerciseConfig = {
       id: `${Date.now()}-${Math.random()}`,
       exerciseId: exercise.id,
       name: exercise.name,
       muscleGroups: exercise.muscleGroups,
-      sets: 3,
-      reps: 10,
-      weight: 0,
+      sets: createDefaultSets(3),
+      notes: '',
     };
 
     setSelectedExercises((prev) => [...prev, newExercise]);
@@ -65,6 +73,55 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
   const updateExercise = (id: string, updates: Partial<ExerciseConfig>) => {
     setSelectedExercises((prev) =>
       prev.map((exercise) => (exercise.id === id ? { ...exercise, ...updates } : exercise))
+    );
+  };
+
+  const updateSet = (exerciseId: string, setId: string, updates: Partial<SetConfig>) => {
+    setSelectedExercises((prev) =>
+      prev.map((exercise) =>
+        exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: exercise.sets.map((set) => (set.id === setId ? { ...set, ...updates } : set)),
+            }
+          : exercise
+      )
+    );
+  };
+
+  const addSet = (exerciseId: string) => {
+    setSelectedExercises((prev) =>
+      prev.map((exercise) =>
+        exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: [
+                ...exercise.sets,
+                {
+                  id: `${Date.now()}-${Math.random()}`,
+                  setNumber: exercise.sets.length + 1,
+                  reps: 10,
+                  weight: 0,
+                },
+              ],
+            }
+          : exercise
+      )
+    );
+  };
+
+  const removeSet = (exerciseId: string, setId: string) => {
+    setSelectedExercises((prev) =>
+      prev.map((exercise) =>
+        exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: exercise.sets
+                .filter((set) => set.id !== setId)
+                .map((set, index) => ({ ...set, setNumber: index + 1 })),
+            }
+          : exercise
+      )
     );
   };
 
@@ -216,52 +273,91 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
                                   </Button>
                                 </div>
 
-                                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3">
-                                  <div>
-                                    <Label className="text-xs text-gray-600">Sets</Label>
-                                    <Input
-                                      type="number"
-                                      value={exercise.sets}
-                                      onChange={(e) => updateExercise(exercise.id, { sets: parseInt(e.target.value) })}
-                                      min="1"
-                                      max="50"
-                                      className="h-8"
+                                {/* Sets Configuration */}
+                                <div className="mt-4 space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-medium">Sets Configuration</Label>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => addSet(exercise.id)}
                                       disabled={isPending}
-                                    />
+                                    >
+                                      <Plus className="w-4 h-4 mr-1" />
+                                      Add Set
+                                    </Button>
                                   </div>
-                                  <div>
-                                    <Label className="text-xs text-gray-600">Reps</Label>
-                                    <Input
-                                      type="number"
-                                      value={exercise.reps || ''}
-                                      onChange={(e) =>
-                                        updateExercise(exercise.id, {
-                                          reps: e.target.value ? parseInt(e.target.value) : undefined,
-                                        })
-                                      }
-                                      min="1"
-                                      max="1000"
-                                      className="h-8"
-                                      disabled={isPending}
-                                    />
+
+                                  <div className="space-y-2">
+                                    {exercise.sets.map((set) => (
+                                      <div
+                                        key={set.id}
+                                        className="flex items-center gap-2 p-2 border rounded bg-gray-50"
+                                      >
+                                        <div className="w-8 text-sm font-medium text-gray-600">Set {set.setNumber}</div>
+                                        <div className="flex-1 grid grid-cols-2 gap-2">
+                                          <div>
+                                            <Label className="text-xs text-gray-600">Reps</Label>
+                                            <Input
+                                              type="number"
+                                              value={set.reps || ''}
+                                              onChange={(e) =>
+                                                updateSet(exercise.id, set.id, {
+                                                  reps: e.target.value ? parseInt(e.target.value) : undefined,
+                                                })
+                                              }
+                                              min="1"
+                                              max="1000"
+                                              className="h-8"
+                                              disabled={isPending}
+                                            />
+                                          </div>
+                                          <div>
+                                            <Label className="text-xs text-gray-600">Weight (lbs)</Label>
+                                            <Input
+                                              type="number"
+                                              value={set.weight}
+                                              onChange={(e) =>
+                                                updateSet(exercise.id, set.id, {
+                                                  weight: parseInt(e.target.value) || 0,
+                                                })
+                                              }
+                                              min="0"
+                                              max="9999"
+                                              className="h-8"
+                                              disabled={isPending}
+                                            />
+                                          </div>
+                                        </div>
+                                        {exercise.sets.length > 1 && (
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => removeSet(exercise.id, set.id)}
+                                            disabled={isPending}
+                                            className="text-red-500 hover:text-red-700"
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
-                                  <div>
-                                    <Label className="text-xs text-gray-600">Weight (lbs)</Label>
-                                    <Input
-                                      type="number"
-                                      value={exercise.weight}
-                                      onChange={(e) =>
-                                        updateExercise(exercise.id, {
-                                          weight: parseInt(e.target.value) || 0,
-                                        })
-                                      }
-                                      min="0"
-                                      max="9999"
-                                      className="h-8"
-                                      disabled={isPending}
-                                      required
-                                    />
-                                  </div>
+                                </div>
+
+                                {/* Notes */}
+                                <div className="mt-4">
+                                  <Label className="text-xs text-gray-600">Notes (optional)</Label>
+                                  <Textarea
+                                    value={exercise.notes || ''}
+                                    onChange={(e) => updateExercise(exercise.id, { notes: e.target.value })}
+                                    placeholder="Add notes for this exercise..."
+                                    rows={2}
+                                    className="mt-1"
+                                    disabled={isPending}
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -293,7 +389,7 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
               <div className="flex items-center gap-2">
                 <Dumbbell className="w-5 h-5 text-gray-500" />
                 <span className="text-sm text-gray-600">
-                  {selectedExercises.reduce((total, ex) => total + ex.sets, 0)} total sets
+                  {selectedExercises.reduce((total, ex) => total + ex.sets.length, 0)} total sets
                 </span>
               </div>
             </div>

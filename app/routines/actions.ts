@@ -1,6 +1,6 @@
 'use server';
 
-import { createRoutine, addExerciseToRoutine } from '@/lib/db/queries/routines';
+import { createRoutine, addExerciseToRoutine, addSetsToRoutineExercise } from '@/lib/db/queries/routines';
 import { parseCreateRoutine, parseExercisesData } from '@/lib/validations/routines';
 import { to, toSync, handleValidationError, protectedAction } from '@/lib/utils/error-handler';
 import { redirect } from 'next/navigation';
@@ -35,22 +35,30 @@ export const createRoutineWithExercisesAction = protectedAction(
 
     await Promise.all(
       exercises.map(async (exercise: ExerciseConfigInput, index: number) => {
-        const [exerciseError] = await to(
+        const [exerciseError, routineExercise] = await to(
           addExerciseToRoutine({
             routineId: routine.id,
             exerciseId: exercise.exerciseId,
             order: index,
-            sets: exercise.sets,
-            reps: exercise.reps || 0,
-            repRangeMin: exercise.repRangeMin || 0,
-            repRangeMax: exercise.repRangeMax || 0,
-            weight: exercise.weight,
-            notes: exercise.notes || '',
+            notes: exercise.notes,
           })
         );
 
-        if (exerciseError) {
+        if (exerciseError || !routineExercise) {
           return { ...DEFAULT_ACTION_STATE, error: 'Failed to add exercises to routine' };
+        }
+
+        // Add sets for this exercise
+        const setsData = exercise.sets.map((set) => ({
+          setNumber: set.setNumber,
+          reps: set.reps,
+          weight: set.weight,
+        }));
+
+        const [setsError] = await to(addSetsToRoutineExercise(routineExercise.id, setsData));
+
+        if (setsError) {
+          return { ...DEFAULT_ACTION_STATE, error: 'Failed to add sets to exercise' };
         }
       })
     );
