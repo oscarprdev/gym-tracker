@@ -55,6 +55,7 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
       muscleGroups: exercise.muscleGroups,
       sets: 3,
       reps: 10,
+      weight: 0,
     };
 
     setSelectedExercises((prev) => [...prev, newExercise]);
@@ -215,7 +216,7 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
                                   </Button>
                                 </div>
 
-                                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3">
                                   <div>
                                     <Label className="text-xs text-gray-600">Sets</Label>
                                     <Input
@@ -248,33 +249,17 @@ export function RoutineBuilderForm({ exercises, userId }: RoutineBuilderFormProp
                                     <Label className="text-xs text-gray-600">Weight (lbs)</Label>
                                     <Input
                                       type="number"
-                                      value={exercise.weight || ''}
+                                      value={exercise.weight}
                                       onChange={(e) =>
                                         updateExercise(exercise.id, {
-                                          weight: e.target.value ? parseFloat(e.target.value) : undefined,
+                                          weight: parseInt(e.target.value) || 0,
                                         })
                                       }
                                       min="0"
                                       max="9999"
-                                      step="0.5"
                                       className="h-8"
                                       disabled={isPending}
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-gray-600">Rest (sec)</Label>
-                                    <Input
-                                      type="number"
-                                      value={exercise.restTime || ''}
-                                      onChange={(e) =>
-                                        updateExercise(exercise.id, {
-                                          restTime: e.target.value ? parseInt(e.target.value) : undefined,
-                                        })
-                                      }
-                                      min="0"
-                                      max="3600"
-                                      className="h-8"
-                                      disabled={isPending}
+                                      required
                                     />
                                   </div>
                                 </div>

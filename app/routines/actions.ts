@@ -44,8 +44,7 @@ export const createRoutineWithExercisesAction = protectedAction(
             reps: exercise.reps || 0,
             repRangeMin: exercise.repRangeMin || 0,
             repRangeMax: exercise.repRangeMax || 0,
-            weight: exercise.weight || 0,
-            restTime: exercise.restTime || 0,
+            weight: exercise.weight,
             notes: exercise.notes || '',
           })
         );

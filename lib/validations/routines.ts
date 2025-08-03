@@ -14,12 +14,7 @@ export const routineExerciseSchema = z.object({
   reps: z.number().min(1, 'At least 1 rep is required').max(1000, 'Maximum 1000 reps allowed').optional(),
   repRangeMin: z.number().min(1, 'Minimum reps must be at least 1').optional(),
   repRangeMax: z.number().min(1, 'Maximum reps must be at least 1').optional(),
-  weight: z.number().min(0, 'Weight cannot be negative').max(9999, 'Weight must be less than 9999').optional(),
-  restTime: z
-    .number()
-    .min(0, 'Rest time cannot be negative')
-    .max(3600, 'Rest time must be less than 1 hour')
-    .optional(),
+  weight: z.number().min(0, 'Weight cannot be negative').max(9999, 'Weight must be less than 9999'),
   notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 
@@ -32,12 +27,7 @@ export const exerciseConfigSchema = z.object({
   reps: z.number().min(1, 'At least 1 rep is required').max(1000, 'Maximum 1000 reps allowed').optional(),
   repRangeMin: z.number().min(1, 'Minimum reps must be at least 1').optional(),
   repRangeMax: z.number().min(1, 'Maximum reps must be at least 1').optional(),
-  weight: z.number().min(0, 'Weight cannot be negative').max(9999, 'Weight must be less than 9999').optional(),
-  restTime: z
-    .number()
-    .min(0, 'Rest time cannot be negative')
-    .max(3600, 'Rest time must be less than 1 hour')
-    .optional(),
+  weight: z.number().min(0, 'Weight cannot be negative').max(9999, 'Weight must be less than 9999'),
   notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
 });
 

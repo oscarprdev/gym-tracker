@@ -51,8 +51,7 @@ export interface ExerciseConfig {
   reps?: number;
   repRangeMin?: number;
   repRangeMax?: number;
-  weight?: number;
-  restTime?: number;
+  weight: number;
   notes?: string;
 }
 

@@ -27,7 +27,7 @@ export const routineExercises = pgTable('routine_exercises', {
   order: integer('order').notNull(),
   sets: integer('sets').notNull(),
   reps: integer('reps'),
-  weight: integer('weight'),
+  weight: integer('weight').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

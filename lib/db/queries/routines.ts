@@ -92,7 +92,6 @@ export async function addExerciseToRoutine(data: {
   repRangeMin: number;
   repRangeMax: number;
   weight: number;
-  restTime: number;
   notes: string;
 }) {
   const result = await db.insert(routineExercises).values(data).returning();
@@ -109,7 +108,6 @@ export async function updateRoutineExercise(
     repRangeMin?: number;
     repRangeMax?: number;
     weight?: number;
-    restTime?: number;
     notes?: string;
   }
 ) {
