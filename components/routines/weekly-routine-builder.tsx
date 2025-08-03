@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import { Calendar, Plus, X, Dumbbell, Target, Clock, CalendarDays, GripVertical } from 'lucide-react';
-import { CreateWorkoutModal, type WorkoutExerciseConfig } from './create-workout-modal';
+import { CreateWorkoutSidebar, type WorkoutExerciseConfig } from './create-workout-sidebar';
 import { createWeeklyRoutineAction } from '@/app/routines/actions';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import type { Exercise } from '@/lib/db/schema/exercises';
@@ -197,7 +197,7 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
                 </div>
               </div>
             </div>
-            <CreateWorkoutModal
+            <CreateWorkoutSidebar
               exercises={exercises}
               onWorkoutCreated={handleWorkoutCreated}
               trigger={
@@ -215,7 +215,7 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
               <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <h3 className="text-lg font-medium mb-2">No workouts scheduled</h3>
               <p className="mb-4">Create your first workout to get started with your weekly routine.</p>
-              <CreateWorkoutModal
+              <CreateWorkoutSidebar
                 exercises={exercises}
                 onWorkoutCreated={handleWorkoutCreated}
                 trigger={

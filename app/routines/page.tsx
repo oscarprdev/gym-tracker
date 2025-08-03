@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { requireAuth } from '@/lib/auth/dal';
 import { getRoutinesWithStatsByUserId } from '@/lib/db/queries/routines';
+import { getAllExercises } from '@/lib/db/queries/exercises';
 import { RoutinesClient } from '@/components/routines/routines-client';
 import { UserMenu } from '@/components/auth/user-menu';
 import { Button } from '@/components/ui/button';
@@ -10,8 +11,9 @@ import Link from 'next/link';
 
 async function RoutinesList({ userId }: { userId: string }) {
   const routines = await getRoutinesWithStatsByUserId(userId);
+  const exercises = await getAllExercises();
 
-  return <RoutinesClient routines={routines} />;
+  return <RoutinesClient routines={routines} exercises={exercises} />;
 }
 
 export default async function RoutinesPage() {

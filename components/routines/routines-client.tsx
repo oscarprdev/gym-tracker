@@ -1,16 +1,18 @@
 import { RoutineCard } from './routine-card';
 import { EmptyState } from '@/components/common/empty-state';
 import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { CreateWorkoutSidebar } from './create-workout-sidebar';
 
 import type { Routine } from '@/lib/types';
+import type { Exercise } from '@/lib/db/schema/exercises';
 
 interface RoutinesClientProps {
   routines: Routine[];
+  exercises: Exercise[];
 }
 
-export function RoutinesClient({ routines }: RoutinesClientProps) {
+export function RoutinesClient({ routines, exercises }: RoutinesClientProps) {
   if (routines.length === 0) {
     return (
       <EmptyState
@@ -18,12 +20,19 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
         title="No routines yet"
         description="Create your first routine to start planning your workouts."
         action={
-          <Button asChild>
-            <Link href="/routines/new">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Routine
-            </Link>
-          </Button>
+          <CreateWorkoutSidebar
+            exercises={exercises}
+            onWorkoutCreated={(workout) => {
+              // This will be handled by the parent component
+              console.log('Workout created:', workout);
+            }}
+            trigger={
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Routine
+              </Button>
+            }
+          />
         }
       />
     );
