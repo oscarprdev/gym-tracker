@@ -43,8 +43,6 @@ export async function getWorkoutWithExercises(workoutId: string) {
           setNumber: workoutExerciseSets.setNumber,
           reps: workoutExerciseSets.reps,
           weight: workoutExerciseSets.weight,
-          restTime: workoutExerciseSets.restTime,
-          isWarmup: workoutExerciseSets.isWarmup,
         })
         .from(workoutExerciseSets)
         .where(eq(workoutExerciseSets.workoutExerciseId, workoutExercise.id))
