@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { GripVertical, Plus, X, Dumbbell, Target, Move, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { GripVertical, Plus, X, Dumbbell, Target, Move, Edit } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { getMuscleGroupColor } from '@/lib/utils/muscle-groups';
-import type { Exercise } from '@/lib/db/schema/exercises';
 
 export interface WorkoutExerciseConfig {
   id: string;
@@ -29,117 +29,29 @@ export interface WorkoutSetConfig {
 }
 
 interface CreateWorkoutSidebarProps {
-  exercises: Exercise[];
+  selectedExercises: WorkoutExerciseConfig[];
   onWorkoutCreated: (workout: { name: string; exercises: WorkoutExerciseConfig[] }) => void;
   trigger?: React.ReactNode;
+  onOpenExerciseSidebar: () => void;
+  onExerciseRemoved: (exerciseId: string) => void;
+  onExerciseReordered: (exercises: WorkoutExerciseConfig[]) => void;
+  onOpenEditSidebar: (exercise: WorkoutExerciseConfig) => void;
 }
 
-export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: CreateWorkoutSidebarProps) {
-  const [isWorkoutSidebarOpen, setIsWorkoutSidebarOpen] = useState(false);
-  const [isExerciseSidebarOpen, setIsExerciseSidebarOpen] = useState(false);
+export function CreateWorkoutSidebar({
+  selectedExercises,
+  onWorkoutCreated,
+  trigger,
+  onOpenExerciseSidebar,
+  onExerciseRemoved,
+  onExerciseReordered,
+  onOpenEditSidebar,
+}: CreateWorkoutSidebarProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [workoutName, setWorkoutName] = useState('');
-  const [selectedExercises, setSelectedExercises] = useState<WorkoutExerciseConfig[]>([]);
-  const [expandedExercises, setExpandedExercises] = useState<Set<string>>(new Set());
-
-  // Close exercise sidebar when workout sidebar closes
-  useEffect(() => {
-    if (!isWorkoutSidebarOpen) {
-      setIsExerciseSidebarOpen(false);
-    }
-  }, [isWorkoutSidebarOpen]);
-
-  const createDefaultSets = (count: number): WorkoutSetConfig[] => {
-    return Array.from({ length: count }, (_, index) => ({
-      id: `${Date.now()}-${Math.random()}-${index}`,
-      setNumber: index + 1,
-      reps: 10,
-      weight: 0,
-    }));
-  };
-
-  const addExercise = (exercise: Exercise) => {
-    const newExercise: WorkoutExerciseConfig = {
-      id: `${Date.now()}-${Math.random()}`,
-      exerciseId: exercise.id,
-      name: exercise.name,
-      muscleGroups: exercise.muscleGroups,
-      position: selectedExercises.length + 1,
-      sets: createDefaultSets(3),
-    };
-
-    setSelectedExercises((prev) => [...prev, newExercise]);
-    setIsExerciseSidebarOpen(false);
-  };
-
-  const updateSet = (exerciseId: string, setId: string, updates: Partial<WorkoutSetConfig>) => {
-    setSelectedExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === exerciseId
-          ? {
-              ...exercise,
-              sets: exercise.sets.map((set) => (set.id === setId ? { ...set, ...updates } : set)),
-            }
-          : exercise
-      )
-    );
-  };
-
-  const addSet = (exerciseId: string) => {
-    setSelectedExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === exerciseId
-          ? {
-              ...exercise,
-              sets: [
-                ...exercise.sets,
-                {
-                  id: `${Date.now()}-${Math.random()}`,
-                  setNumber: exercise.sets.length + 1,
-                  reps: 10,
-                  weight: 0,
-                },
-              ],
-            }
-          : exercise
-      )
-    );
-  };
-
-  const removeSet = (exerciseId: string, setId: string) => {
-    setSelectedExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === exerciseId
-          ? {
-              ...exercise,
-              sets: exercise.sets
-                .filter((set) => set.id !== setId)
-                .map((set, index) => ({ ...set, setNumber: index + 1 })),
-            }
-          : exercise
-      )
-    );
-  };
 
   const removeExercise = (id: string) => {
-    setSelectedExercises((prev) => {
-      const filtered = prev.filter((exercise) => exercise.id !== id);
-      return filtered.map((exercise, index) => ({
-        ...exercise,
-        position: index + 1,
-      }));
-    });
-  };
-
-  const toggleExerciseExpansion = (exerciseId: string) => {
-    setExpandedExercises((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(exerciseId)) {
-        newSet.delete(exerciseId);
-      } else {
-        newSet.add(exerciseId);
-      }
-      return newSet;
-    });
+    onExerciseRemoved(id);
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -154,7 +66,7 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
       position: index + 1,
     }));
 
-    setSelectedExercises(updatedItems);
+    onExerciseReordered(updatedItems);
   };
 
   const handleCreateWorkout = () => {
@@ -166,42 +78,36 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
     });
 
     setWorkoutName('');
-    setSelectedExercises([]);
-    setExpandedExercises(new Set());
-    setIsWorkoutSidebarOpen(false);
+    setIsOpen(false);
   };
 
-  const handleWorkoutSidebarOpenChange = (open: boolean) => {
-    setIsWorkoutSidebarOpen(open);
+  const handleSidebarOpenChange = (open: boolean) => {
+    setIsOpen(open);
     if (!open) {
       setWorkoutName('');
-      setSelectedExercises([]);
-      setExpandedExercises(new Set());
-      setIsExerciseSidebarOpen(false);
     }
   };
 
   return (
-    <>
-      {/* Main Workout Creation Sidebar */}
-      <Sheet open={isWorkoutSidebarOpen} onOpenChange={handleWorkoutSidebarOpenChange}>
-        <SheetTrigger asChild>
-          {trigger || (
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Workout
-            </Button>
-          )}
-        </SheetTrigger>
-        <SheetContent side="right">
-          <SheetHeader>
-            <SheetTitle>Create New Workout</SheetTitle>
-            <SheetDescription>
-              Build your workout by adding exercises and configuring sets, reps, and weights.
-            </SheetDescription>
-          </SheetHeader>
+    <Sheet open={isOpen} onOpenChange={handleSidebarOpenChange}>
+      <SheetTrigger asChild>
+        {trigger || (
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Workout
+          </Button>
+        )}
+      </SheetTrigger>
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle>Create New Workout</SheetTitle>
+          <SheetDescription>
+            Build your workout by adding exercises and configuring sets, reps, and weights.
+          </SheetDescription>
+        </SheetHeader>
 
-          <div className="space-y-6 mt-6">
+        <ScrollArea className="h-full">
+          <div className="space-y-6 mt-6 pr-4">
             {/* Workout Details */}
             <Card>
               <CardHeader>
@@ -232,14 +138,14 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
                     <CardTitle>Exercises</CardTitle>
                     <CardDescription>Add and configure exercises for your workout</CardDescription>
                   </div>
-                  <Button type="button" onClick={() => setIsExerciseSidebarOpen(true)}>
+                  <Button type="button" onClick={onOpenExerciseSidebar}>
                     <Plus className="w-4 h-4 mr-2" />
                     Add Exercise
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                {selectedExercises.length === 0 ? (
+                {selectedExercises?.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <Dumbbell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p>No exercises added yet. Click &quot;Add Exercise&quot; to get started.</p>
@@ -284,13 +190,9 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
                                               type="button"
                                               variant="ghost"
                                               size="sm"
-                                              onClick={() => toggleExerciseExpansion(exercise.id)}
+                                              onClick={() => onOpenEditSidebar(exercise)}
                                             >
-                                              {expandedExercises.has(exercise.id) ? (
-                                                <ChevronUp className="w-4 h-4" />
-                                              ) : (
-                                                <ChevronDown className="w-4 h-4" />
-                                              )}
+                                              <Edit className="w-4 h-4" />
                                             </Button>
                                             <Button
                                               type="button"
@@ -303,79 +205,13 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
                                           </div>
                                         </div>
 
-                                        {/* Expandable Sets Configuration */}
-                                        {expandedExercises.has(exercise.id) && (
-                                          <div className="mt-4 space-y-3 border-t pt-4">
-                                            <div className="flex items-center justify-between">
-                                              <Label className="text-sm font-medium">Sets Configuration</Label>
-                                              <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => addSet(exercise.id)}
-                                              >
-                                                <Plus className="w-4 h-4 mr-1" />
-                                                Add Set
-                                              </Button>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                              {exercise.sets.map((set) => (
-                                                <div
-                                                  key={set.id}
-                                                  className="flex items-center gap-2 p-3 border rounded bg-gray-50"
-                                                >
-                                                  <div className="w-8 text-sm font-medium text-gray-600">
-                                                    Set {set.setNumber}
-                                                  </div>
-                                                  <div className="flex-1 grid grid-cols-2 gap-3">
-                                                    <div>
-                                                      <Label className="text-xs text-gray-600">Reps</Label>
-                                                      <Input
-                                                        type="number"
-                                                        value={set.reps || ''}
-                                                        onChange={(e) =>
-                                                          updateSet(exercise.id, set.id, {
-                                                            reps: e.target.value ? parseInt(e.target.value) : undefined,
-                                                          })
-                                                        }
-                                                        min="1"
-                                                        max="1000"
-                                                        className="h-8"
-                                                      />
-                                                    </div>
-                                                    <div>
-                                                      <Label className="text-xs text-gray-600">Weight (lbs)</Label>
-                                                      <Input
-                                                        type="number"
-                                                        value={set.weight}
-                                                        onChange={(e) =>
-                                                          updateSet(exercise.id, set.id, {
-                                                            weight: parseInt(e.target.value) || 0,
-                                                          })
-                                                        }
-                                                        min="0"
-                                                        max="9999"
-                                                        className="h-8"
-                                                      />
-                                                    </div>
-                                                  </div>
-                                                  {exercise.sets.length > 1 && (
-                                                    <Button
-                                                      type="button"
-                                                      variant="ghost"
-                                                      size="sm"
-                                                      onClick={() => removeSet(exercise.id, set.id)}
-                                                      className="text-red-500 hover:text-red-700"
-                                                    >
-                                                      <X className="w-4 h-4" />
-                                                    </Button>
-                                                  )}
-                                                </div>
-                                              ))}
-                                            </div>
+                                        {/* Exercise Summary */}
+                                        <div className="mt-3 pt-3 border-t">
+                                          <div className="flex items-center justify-between text-sm text-gray-600">
+                                            <span>{exercise.sets.length} sets</span>
+                                            <span>~{exercise.sets.length * 2 + 1} min</span>
                                           </div>
-                                        )}
+                                        </div>
                                       </CardContent>
                                     </Card>
                                   </div>
@@ -422,8 +258,8 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
             )}
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={() => handleWorkoutSidebarOpenChange(false)}>
+            <div className="flex justify-end gap-3 pt-4 border-t pb-6">
+              <Button variant="outline" onClick={() => handleSidebarOpenChange(false)}>
                 Cancel
               </Button>
               <Button onClick={handleCreateWorkout} disabled={!workoutName.trim() || selectedExercises.length === 0}>
@@ -431,46 +267,8 @@ export function CreateWorkoutSidebar({ exercises, onWorkoutCreated, trigger }: C
               </Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Exercise Selection Sidebar (Nested Sheet) */}
-      <Sheet open={isExerciseSidebarOpen} onOpenChange={setIsExerciseSidebarOpen}>
-        <SheetContent side="right">
-          <SheetHeader>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsExerciseSidebarOpen(false)} className="p-1 h-8 w-8">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <SheetTitle>Select Exercise</SheetTitle>
-                <SheetDescription>Choose an exercise to add to your workout</SheetDescription>
-              </div>
-            </div>
-          </SheetHeader>
-
-          <div className="mt-6 space-y-4">
-            {exercises.map((exercise) => (
-              <Card
-                key={exercise.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => addExercise(exercise)}
-              >
-                <CardContent className="p-4">
-                  <h4 className="font-semibold mb-2">{exercise.name}</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {exercise.muscleGroups.map((group: string) => (
-                      <Badge key={group} variant="secondary" className={`text-xs ${getMuscleGroupColor(group)}`}>
-                        {group}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+        </ScrollArea>
+      </SheetContent>
+    </Sheet>
   );
 }

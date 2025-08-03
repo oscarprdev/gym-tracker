@@ -2,7 +2,7 @@ import { RoutineCard } from './routine-card';
 import { EmptyState } from '@/components/common/empty-state';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CreateWorkoutSidebar } from './create-workout-sidebar';
+import { WorkoutBuilder } from './workout-builder';
 
 import type { Routine } from '@/lib/types';
 import type { Exercise } from '@/lib/db/schema/exercises';
@@ -20,7 +20,7 @@ export function RoutinesClient({ routines, exercises }: RoutinesClientProps) {
         title="No routines yet"
         description="Create your first routine to start planning your workouts."
         action={
-          <CreateWorkoutSidebar
+          <WorkoutBuilder
             exercises={exercises}
             onWorkoutCreated={(workout) => {
               // This will be handled by the parent component
