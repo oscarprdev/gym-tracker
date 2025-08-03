@@ -36,7 +36,7 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
 
   const createDefaultSets = (count: number): WorkoutSetConfig[] => {
     return Array.from({ length: count }, (_, index) => ({
-      id: `${Date.now()}-${Math.random()}-${index}`,
+      id: `set-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${index}`,
       setNumber: index + 1,
       reps: 10,
       weight: 0,
@@ -49,7 +49,7 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
 
   const handleExerciseSelected = (exercise: Exercise) => {
     const newExercise: WorkoutExerciseConfig = {
-      id: `${Date.now()}-${Math.random()}`,
+      id: `exercise-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       exerciseId: exercise.id,
       name: exercise.name,
       muscleGroups: exercise.muscleGroups,
@@ -75,6 +75,8 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
     setSelectedExercises((prev) =>
       prev.map((exercise) => (exercise.id === exerciseId ? { ...exercise, ...updates } : exercise))
     );
+    // Update the editing exercise state as well
+    setEditingExercise((prev) => (prev?.id === exerciseId ? { ...prev, ...updates } : prev));
   };
 
   const handleExerciseReordered = (reorderedExercises: WorkoutExerciseConfig[]) => {
@@ -82,7 +84,7 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
   };
 
   const handleOpenEditSidebar = (exercise: WorkoutExerciseConfig) => {
-    setEditingExercise(exercise);
+    setEditingExercise({ ...exercise }); // Create a copy to ensure proper state update
     setIsEditSidebarOpen(true);
   };
 
@@ -112,7 +114,12 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
 
       <ExerciseEditSidebar
         isOpen={isEditSidebarOpen}
-        onOpenChange={setIsEditSidebarOpen}
+        onOpenChange={(open) => {
+          setIsEditSidebarOpen(open);
+          if (!open) {
+            setEditingExercise(null);
+          }
+        }}
         exercise={editingExercise}
         onExerciseUpdated={handleExerciseUpdated}
       />

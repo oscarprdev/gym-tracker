@@ -31,7 +31,7 @@ export function ExerciseEditSidebar({ isOpen, onOpenChange, exercise, onExercise
 
   const addSet = () => {
     const newSet: WorkoutSetConfig = {
-      id: `${Date.now()}-${Math.random()}`,
+      id: `set-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       setNumber: exercise.sets.length + 1,
       reps: 10,
       weight: 0,
@@ -46,6 +46,8 @@ export function ExerciseEditSidebar({ isOpen, onOpenChange, exercise, onExercise
   };
 
   const removeSet = (setId: string) => {
+    if (exercise.sets.length <= 1) return; // Prevent removing the last set
+
     const updatedExercise = {
       ...exercise,
       sets: exercise.sets.filter((set) => set.id !== setId).map((set, index) => ({ ...set, setNumber: index + 1 })),
@@ -130,10 +132,10 @@ export function ExerciseEditSidebar({ isOpen, onOpenChange, exercise, onExercise
                           <Label className="text-xs text-gray-600">Weight (lbs)</Label>
                           <Input
                             type="number"
-                            value={set.weight}
+                            value={set.weight || ''}
                             onChange={(e) =>
                               updateSet(set.id, {
-                                weight: parseInt(e.target.value) || 0,
+                                weight: e.target.value ? parseInt(e.target.value) : 0,
                               })
                             }
                             min="0"
@@ -142,17 +144,16 @@ export function ExerciseEditSidebar({ isOpen, onOpenChange, exercise, onExercise
                           />
                         </div>
                       </div>
-                      {exercise.sets.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeSet(set.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      )}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeSet(set.id)}
+                        disabled={exercise.sets.length <= 1}
+                        className="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
                   ))}
                 </div>
