@@ -3,7 +3,7 @@ import { users } from './auth';
 import { exercises } from './exercises';
 import { routines, weeklySchedule } from './routines';
 import { workouts, workoutExercises, workoutExerciseSets } from './workouts';
-import { workoutSessions, exerciseLogs, setLogs } from './workout-sessions';
+import { workoutSessions } from './workout-sessions';
 
 // User relations
 export const userRelations = relations(users, ({ many }) => ({
@@ -20,7 +20,6 @@ export const exercisesRelations = relations(exercises, ({ one, many }) => ({
     references: [users.id],
   }),
   workoutExercises: many(workoutExercises),
-  exerciseLogs: many(exerciseLogs),
 }));
 
 // Routine relations
@@ -77,7 +76,7 @@ export const weeklyScheduleRelations = relations(weeklySchedule, ({ one }) => ({
 }));
 
 // Workout session relations
-export const workoutSessionsRelations = relations(workoutSessions, ({ one, many }) => ({
+export const workoutSessionsRelations = relations(workoutSessions, ({ one }) => ({
   user: one(users, {
     fields: [workoutSessions.userId],
     references: [users.id],
@@ -85,25 +84,5 @@ export const workoutSessionsRelations = relations(workoutSessions, ({ one, many 
   workout: one(workouts, {
     fields: [workoutSessions.workoutId],
     references: [workouts.id],
-  }),
-  exerciseLogs: many(exerciseLogs),
-}));
-
-export const exerciseLogsRelations = relations(exerciseLogs, ({ one, many }) => ({
-  session: one(workoutSessions, {
-    fields: [exerciseLogs.sessionId],
-    references: [workoutSessions.id],
-  }),
-  exercise: one(exercises, {
-    fields: [exerciseLogs.exerciseId],
-    references: [exercises.id],
-  }),
-  sets: many(setLogs),
-}));
-
-export const setLogsRelations = relations(setLogs, ({ one }) => ({
-  exerciseLog: one(exerciseLogs, {
-    fields: [setLogs.exerciseLogId],
-    references: [exerciseLogs.id],
   }),
 }));

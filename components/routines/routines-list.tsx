@@ -7,12 +7,12 @@ import { WorkoutBuilder } from '../routines-new/workout-builder';
 import type { Routine } from '@/lib/types';
 import type { Exercise } from '@/lib/db/schema/exercises';
 
-interface RoutinesClientProps {
+interface RoutinesListProps {
   routines: Routine[];
   exercises: Exercise[];
 }
 
-export function RoutinesClient({ routines, exercises }: RoutinesClientProps) {
+export function RoutinesList({ routines, exercises }: RoutinesListProps) {
   if (routines.length === 0) {
     return (
       <EmptyState

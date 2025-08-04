@@ -3,6 +3,7 @@
 import { cache } from 'react';
 import { headers } from 'next/headers';
 import { auth } from './auth';
+import { redirect } from 'next/navigation';
 
 /**
  * Data Access Layer for authentication
@@ -52,7 +53,7 @@ export const requireAuth = cache(async () => {
   const sessionData = await verifySession();
 
   if (!sessionData) {
-    throw new Error('Authentication required');
+    redirect('/login');
   }
 
   return sessionData;

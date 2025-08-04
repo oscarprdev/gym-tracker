@@ -5,14 +5,16 @@ export interface WorkoutExerciseSet {
   weight: number;
 }
 
+export interface Exercise {
+  id: string;
+  name: string;
+  muscleGroups: string[];
+}
+
 export interface WorkoutExercise {
   id: string;
   order: number;
-  exercise: {
-    id: string;
-    name: string;
-    muscleGroups: string[];
-  };
+  exercise: Exercise;
   sets: WorkoutExerciseSet[];
 }
 
@@ -21,7 +23,6 @@ export interface Workout {
   name: string;
   dayOfWeek: number | null;
   order: number;
-  estimatedDuration: number | null;
   exercises: WorkoutExercise[];
 }
 

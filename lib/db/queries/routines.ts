@@ -1,193 +1,233 @@
 import { db } from '../client';
 import { routines } from '../schema/routines';
 import { workouts, workoutExercises, workoutExerciseSets } from '../schema/workouts';
-import { exercises } from '../schema/exercises';
 import { eq, desc, asc } from 'drizzle-orm';
 import { to } from '@/lib/utils';
 
-export async function getRoutinesByUserId(userId: string) {
-  return db.select().from(routines).where(eq(routines.userId, userId)).orderBy(desc(routines.updatedAt));
-}
+export const ROUTINES = {
+  GET_BY_USER_ID: async (userId: string) => {
+    return db.query.routines.findMany({
+      where: eq(routines.userId, userId),
+      orderBy: desc(routines.updatedAt),
+    });
+  },
 
-export async function getRoutineById(id: string) {
-  const result = await db.select().from(routines).where(eq(routines.id, id)).limit(1);
+  GET_BY_ID: async (id: string) => {
+    return db.query.routines.findFirst({
+      where: eq(routines.id, id),
+    });
+  },
 
-  return result[0] || null;
-}
-
-export async function getRoutineWithWorkouts(routineId: string) {
-  const routine = await getRoutineById(routineId);
-  if (!routine) return null;
-
-  const workoutsData = await db
-    .select({
-      id: workouts.id,
-      name: workouts.name,
-      dayOfWeek: workouts.dayOfWeek,
-      order: workouts.order,
-      estimatedDuration: workouts.estimatedDuration,
-    })
-    .from(workouts)
-    .where(eq(workouts.routineId, routineId))
-    .orderBy(asc(workouts.order));
-
-  // Fetch exercises and sets for each workout
-  const workoutsWithExercises = await Promise.all(
-    workoutsData.map(async (workout) => {
-      const workoutExercisesData = await db
-        .select({
-          id: workoutExercises.id,
-          order: workoutExercises.order,
-          exercise: {
-            id: exercises.id,
-            name: exercises.name,
-            muscleGroups: exercises.muscleGroups,
+  GET_WITH_WORKOUTS: async (routineId: string) => {
+    const result = await db.query.routines.findFirst({
+      where: eq(routines.id, routineId),
+      with: {
+        workouts: {
+          orderBy: asc(workouts.order),
+          with: {
+            workoutExercises: {
+              orderBy: asc(workoutExercises.order),
+              with: {
+                exercise: true,
+                sets: {
+                  orderBy: asc(workoutExerciseSets.setNumber),
+                },
+              },
+            },
           },
-        })
-        .from(workoutExercises)
-        .innerJoin(exercises, eq(workoutExercises.exerciseId, exercises.id))
-        .where(eq(workoutExercises.workoutId, workout.id))
-        .orderBy(asc(workoutExercises.order));
+        },
+      },
+    });
 
-      // Fetch sets for each exercise
-      const exercisesWithSets = await Promise.all(
-        workoutExercisesData.map(async (workoutExercise) => {
-          const sets = await db
-            .select({
-              id: workoutExerciseSets.id,
-              setNumber: workoutExerciseSets.setNumber,
-              reps: workoutExerciseSets.reps,
-              weight: workoutExerciseSets.weight,
-            })
-            .from(workoutExerciseSets)
-            .where(eq(workoutExerciseSets.workoutExerciseId, workoutExercise.id))
-            .orderBy(asc(workoutExerciseSets.setNumber));
+    if (!result) return null;
 
-          return {
-            ...workoutExercise,
-            sets,
-          };
-        })
-      );
+    const transformedWorkouts = result.workouts.map((workout) => ({
+      id: workout.id,
+      name: workout.name,
+      dayOfWeek: workout.dayOfWeek,
+      order: workout.order,
+      exercises: workout.workoutExercises.map((workoutExercise) => ({
+        id: workoutExercise.id,
+        order: workoutExercise.order,
+        exercise: {
+          id: workoutExercise.exercise.id,
+          name: workoutExercise.exercise.name,
+          muscleGroups: workoutExercise.exercise.muscleGroups,
+        },
+        sets: workoutExercise.sets.map((set) => ({
+          id: set.id,
+          setNumber: set.setNumber,
+          reps: set.reps,
+          weight: set.weight,
+        })),
+      })),
+    }));
 
-      return {
-        ...workout,
-        exercises: exercisesWithSets,
-      };
-    })
-  );
-
-  return {
-    ...routine,
-    workouts: workoutsWithExercises,
-  };
-}
-
-export async function createRoutine(data: { userId: string; name: string }) {
-  const result = await db
-    .insert(routines)
-    .values({
-      userId: data.userId,
-      name: data.name,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning();
-
-  return result[0];
-}
-
-export async function updateRoutine(
-  id: string,
-  data: {
-    name?: string;
-    isTemplate?: boolean;
-    color?: string;
-    estimatedDuration?: number;
-  }
-) {
-  const result = await db
-    .update(routines)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(routines.id, id))
-    .returning();
-
-  return result[0];
-}
-
-export async function deleteRoutine(id: string) {
-  await db.delete(routines).where(eq(routines.id, id));
-}
-
-export async function getRoutineStats(routineId: string) {
-  const [error, data] = await to(
-    db
-      .select({
-        muscleGroups: exercises.muscleGroups,
-        setsCount: workoutExerciseSets.id,
-      })
-      .from(workouts)
-      .innerJoin(workoutExercises, eq(workouts.id, workoutExercises.workoutId))
-      .innerJoin(exercises, eq(workoutExercises.exerciseId, exercises.id))
-      .leftJoin(workoutExerciseSets, eq(workoutExercises.id, workoutExerciseSets.workoutExerciseId))
-      .where(eq(workouts.routineId, routineId))
-  );
-
-  if (error || !data) {
     return {
-      muscleGroups: [],
-      totalWorkouts: 0,
-      totalExercises: 0,
-      totalSets: 0,
+      ...result,
+      workouts: transformedWorkouts,
     };
-  }
+  },
 
-  const muscleGroups = new Set<string>();
-  let totalSets = 0;
-  const uniqueWorkouts = new Set();
-  const uniqueExercises = new Set();
+  CREATE: async (data: { userId: string; name: string }) => {
+    const result = await db
+      .insert(routines)
+      .values({
+        userId: data.userId,
+        name: data.name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
 
-  data.forEach((item) => {
-    if (item.muscleGroups && Array.isArray(item.muscleGroups)) {
-      item.muscleGroups.forEach((group: string) => {
-        if (group && typeof group === 'string') {
-          muscleGroups.add(group);
+    return result[0];
+  },
+
+  UPDATE: async (
+    id: string,
+    data: {
+      name?: string;
+      color?: string;
+    }
+  ) => {
+    const result = await db
+      .update(routines)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(routines.id, id))
+      .returning();
+
+    return result[0];
+  },
+
+  DELETE: async (id: string) => {
+    await db.delete(routines).where(eq(routines.id, id));
+  },
+
+  GET_STATS: async (routineId: string) => {
+    const [error, data] = await to(
+      db.query.routines.findFirst({
+        where: eq(routines.id, routineId),
+        with: {
+          workouts: {
+            with: {
+              workoutExercises: {
+                with: {
+                  exercise: true,
+                  sets: true,
+                },
+              },
+            },
+          },
+        },
+      })
+    );
+
+    if (error || !data) {
+      return {
+        muscleGroups: [],
+        totalWorkouts: 0,
+        totalExercises: 0,
+        totalSets: 0,
+      };
+    }
+
+    const muscleGroups = new Set<string>();
+    let totalSets = 0;
+    const uniqueWorkouts = new Set();
+    const uniqueExercises = new Set();
+
+    data.workouts.forEach((workout) => {
+      uniqueWorkouts.add(workout.id);
+
+      workout.workoutExercises.forEach((workoutExercise) => {
+        uniqueExercises.add(workoutExercise.id);
+
+        if (workoutExercise.exercise.muscleGroups && Array.isArray(workoutExercise.exercise.muscleGroups)) {
+          workoutExercise.exercise.muscleGroups.forEach((group: string) => {
+            if (group && typeof group === 'string') {
+              muscleGroups.add(group);
+            }
+          });
         }
+
+        totalSets += workoutExercise.sets.length;
       });
-    }
-    if (item.setsCount) {
-      totalSets++;
-    }
-  });
+    });
 
-  return {
-    muscleGroups: Array.from(muscleGroups).sort(),
-    totalWorkouts: uniqueWorkouts.size,
-    totalExercises: uniqueExercises.size,
-    totalSets,
-  };
-}
+    return {
+      muscleGroups: Array.from(muscleGroups).sort(),
+      totalWorkouts: uniqueWorkouts.size,
+      totalExercises: uniqueExercises.size,
+      totalSets,
+    };
+  },
 
-export async function getRoutinesWithStatsByUserId(userId: string, limit?: number) {
-  const routinesData = await db
-    .select()
-    .from(routines)
-    .where(eq(routines.userId, userId))
-    .orderBy(desc(routines.updatedAt))
-    .limit(limit || 10);
+  GET_WITH_STATS_BY_USER_ID: async (userId: string, limit?: number) => {
+    const routinesData = await db.query.routines.findMany({
+      where: eq(routines.userId, userId),
+      orderBy: desc(routines.updatedAt),
+      limit: limit || 10,
+      with: {
+        workouts: {
+          with: {
+            workoutExercises: {
+              with: {
+                exercise: true,
+                sets: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-  const routinesWithStats = await Promise.all(
-    routinesData.map(async (routine) => {
-      const stats = await getRoutineStats(routine.id);
+    return routinesData.map((routine) => {
+      const muscleGroups = new Set<string>();
+      let totalSets = 0;
+      const uniqueWorkouts = new Set();
+      const uniqueExercises = new Set();
+
+      routine.workouts.forEach((workout) => {
+        uniqueWorkouts.add(workout.id);
+
+        workout.workoutExercises.forEach((workoutExercise) => {
+          uniqueExercises.add(workoutExercise.id);
+
+          if (workoutExercise.exercise.muscleGroups && Array.isArray(workoutExercise.exercise.muscleGroups)) {
+            workoutExercise.exercise.muscleGroups.forEach((group: string) => {
+              if (group && typeof group === 'string') {
+                muscleGroups.add(group);
+              }
+            });
+          }
+
+          totalSets += workoutExercise.sets.length;
+        });
+      });
+
+      const stats = {
+        muscleGroups: Array.from(muscleGroups).sort(),
+        totalWorkouts: uniqueWorkouts.size,
+        totalExercises: uniqueExercises.size,
+        totalSets,
+      };
+
       return {
         ...routine,
         stats,
       };
-    })
-  );
+    });
+  },
+};
 
-  return routinesWithStats;
-}
+export const getRoutinesByUserId = ROUTINES.GET_BY_USER_ID;
+export const getRoutineById = ROUTINES.GET_BY_ID;
+export const getRoutineWithWorkouts = ROUTINES.GET_WITH_WORKOUTS;
+export const createRoutine = ROUTINES.CREATE;
+export const updateRoutine = ROUTINES.UPDATE;
+export const deleteRoutine = ROUTINES.DELETE;
+export const getRoutineStats = ROUTINES.GET_STATS;
+export const getRoutinesWithStatsByUserId = ROUTINES.GET_WITH_STATS_BY_USER_ID;

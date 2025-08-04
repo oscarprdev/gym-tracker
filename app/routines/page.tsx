@@ -2,18 +2,17 @@ import { Suspense } from 'react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { requireAuth } from '@/lib/auth/dal';
 import { getRoutinesWithStatsByUserId } from '@/lib/db/queries/routines';
-import { getAllExercises } from '@/lib/db/queries/exercises';
-import { RoutinesClient } from '@/components/routines/routines-client';
+import { RoutinesList } from '@/components/routines/routines-list';
 import { UserMenu } from '@/components/auth/user-menu';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { getExercisesByUser } from '@/lib/db/queries';
 
-async function RoutinesList({ userId }: { userId: string }) {
-  const routines = await getRoutinesWithStatsByUserId(userId);
-  const exercises = await getAllExercises();
+async function RoutinesListServer({ userId }: { userId: string }) {
+  const [routines, exercises] = await Promise.all([getRoutinesWithStatsByUserId(userId), getExercisesByUser(userId)]);
 
-  return <RoutinesClient routines={routines} exercises={exercises} />;
+  return <RoutinesList routines={routines} exercises={exercises} />;
 }
 
 export default async function RoutinesPage() {
@@ -55,7 +54,7 @@ export default async function RoutinesPage() {
 
           {/* Routines List */}
           <Suspense fallback={<LoadingSpinner />}>
-            <RoutinesList userId={session.user.id} />
+            <RoutinesListServer userId={session.user.id} />
           </Suspense>
         </div>
       </main>

@@ -36,6 +36,9 @@ interface CreateWorkoutSidebarProps {
   onExerciseRemoved: (exerciseId: string) => void;
   onExerciseReordered: (exercises: WorkoutExerciseConfig[]) => void;
   onOpenEditSidebar: (exercise: WorkoutExerciseConfig) => void;
+  initialWorkoutName?: string;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function CreateWorkoutSidebar({
@@ -46,9 +49,16 @@ export function CreateWorkoutSidebar({
   onExerciseRemoved,
   onExerciseReordered,
   onOpenEditSidebar,
+  initialWorkoutName,
+  isOpen: controlledIsOpen,
+  onOpenChange: controlledOnOpenChange,
 }: CreateWorkoutSidebarProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [workoutName, setWorkoutName] = useState('');
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const [workoutName, setWorkoutName] = useState(initialWorkoutName || '');
+
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const setIsOpen = controlledOnOpenChange || setInternalIsOpen;
 
   const removeExercise = (id: string) => {
     onExerciseRemoved(id);
@@ -84,7 +94,7 @@ export function CreateWorkoutSidebar({
   const handleSidebarOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      setWorkoutName('');
+      setWorkoutName(initialWorkoutName || '');
     }
   };
 
@@ -100,7 +110,7 @@ export function CreateWorkoutSidebar({
       </SheetTrigger>
       <SheetContent side="right">
         <SheetHeader>
-          <SheetTitle>Create New Workout</SheetTitle>
+          <SheetTitle>{initialWorkoutName ? 'Edit Workout' : 'Create New Workout'}</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col">
@@ -251,7 +261,7 @@ export function CreateWorkoutSidebar({
               Cancel
             </Button>
             <Button onClick={handleCreateWorkout} disabled={!workoutName.trim() || selectedExercises.length === 0}>
-              Create Workout
+              {initialWorkoutName ? 'Update Workout' : 'Create Workout'}
             </Button>
           </div>
         </div>

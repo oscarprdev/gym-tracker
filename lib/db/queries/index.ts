@@ -1,14 +1,11 @@
-// User queries
+export { USERS } from './users';
+export { EXERCISES } from './exercises';
+export { ROUTINES } from './routines';
+export { WORKOUTS } from './workouts';
+export { WORKOUT_SESSIONS } from './workout-sessions';
+
 export * from './users';
-
-// Exercise queries
 export * from './exercises';
-
-// Routine queries
 export * from './routines';
-
-// Workout queries
 export * from './workouts';
-
-// Workout session queries
 export * from './workout-sessions';

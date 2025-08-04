@@ -11,7 +11,6 @@ export const workouts = pgTable('workouts', {
   description: text('description'),
   dayOfWeek: integer('day_of_week'), // 0 = Sunday, 1 = Monday, etc. (optional for flexible scheduling)
   order: integer('order').notNull(), // Order within the routine (1-7)
-  estimatedDuration: integer('estimated_duration'), // in minutes
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -25,7 +24,6 @@ export const workoutExercises = pgTable('workout_exercises', {
     .notNull()
     .references(() => exercises.id, { onDelete: 'cascade' }),
   order: integer('order').notNull(),
-  notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

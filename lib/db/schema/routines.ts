@@ -8,9 +8,7 @@ export const routines = pgTable('routines', {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   description: text('description'),
-  isTemplate: boolean('is_template').default(false),
   color: text('color'),
-  estimatedDuration: integer('estimated_duration'), // in minutes
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

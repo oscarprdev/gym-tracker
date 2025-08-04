@@ -2,33 +2,32 @@ import { db } from '../client';
 import { users } from '../schema/auth';
 import { eq } from 'drizzle-orm';
 
-/**
- * User-related database queries
- */
+export const USERS = {
+  GET_BY_EMAIL: async (email: string) => {
+    return db.query.users.findFirst({
+      where: eq(users.email, email),
+      with: {
+        routines: true,
+      },
+    });
+  },
 
-export async function getUserById(id: string) {
-  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  UPDATE: async (userId: string, data: { name: string; email: string }) => {
+    await db
+      .update(users)
+      .set({
+        name: data.name,
+        email: data.email,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  },
 
-  return result[0] || null;
-}
+  DELETE: async (userId: string) => {
+    await db.delete(users).where(eq(users.id, userId));
+  },
+};
 
-export async function getUserByEmail(email: string) {
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-
-  return result[0] || null;
-}
-
-export async function updateUserProfile(userId: string, data: { name: string; email: string }) {
-  await db
-    .update(users)
-    .set({
-      name: data.name,
-      email: data.email,
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, userId));
-}
-
-export async function deleteUser(userId: string) {
-  await db.delete(users).where(eq(users.id, userId));
-}
+export const getUserByEmail = USERS.GET_BY_EMAIL;
+export const updateUserProfile = USERS.UPDATE;
+export const deleteUser = USERS.DELETE;

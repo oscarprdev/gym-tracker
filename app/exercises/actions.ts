@@ -2,21 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { to, toSync, handleValidationError, protectedAction } from '@/lib/utils/error-handler';
-import {
-  parseCreateExercise,
-  parseUpdateExercise,
-  parseSearchExercises,
-  type SearchExercisesInput,
-} from '@/lib/validations/exercises';
-import {
-  createExercise,
-  updateExercise,
-  deleteExercise,
-  searchExercises,
-  getAllExercises,
-  getUserCustomExercises,
-  getBuiltInExercises,
-} from '@/lib/db/queries/exercises';
+import { parseCreateExercise, parseUpdateExercise } from '@/lib/validations/exercises';
+import { createExercise, updateExercise, deleteExercise } from '@/lib/db/queries/exercises';
 
 export const createExerciseAction = protectedAction(
   async (session, prevState: { error: string | null; fieldErrors?: Record<string, string[]> }, formData: FormData) => {
@@ -35,7 +22,6 @@ export const createExerciseAction = protectedAction(
       createExercise({
         name: validatedData.name,
         muscleGroups: validatedData.muscleGroups,
-        isCustom: true,
         createdBy: session.user.id,
       })
     );
@@ -90,55 +76,3 @@ export const deleteExerciseAction = protectedAction(async (session, exerciseId: 
   revalidatePath('/exercises');
   return { success: true, error: null };
 });
-
-export async function searchExercisesAction(params: SearchExercisesInput) {
-  const [validationError, validatedParams] = toSync(() => parseSearchExercises(params));
-
-  const validationErrorResult = handleValidationError(validationError, validatedParams);
-
-  if (validationErrorResult) {
-    return validationErrorResult;
-  }
-
-  if (!validatedParams) {
-    return { error: 'Invalid search parameters' };
-  }
-
-  const [searchError, exercises] = await to(searchExercises(validatedParams));
-
-  if (searchError) {
-    return { error: searchError.message || 'Failed to search exercises' };
-  }
-
-  return { success: true, data: exercises };
-}
-
-export async function getAllExercisesAction() {
-  const [error, exercises] = await to(getAllExercises());
-
-  if (error) {
-    return { error: 'Failed to fetch exercises' };
-  }
-
-  return { success: true, data: exercises };
-}
-
-export const getUserCustomExercisesAction = protectedAction(async (session) => {
-  const [error, exercises] = await to(getUserCustomExercises(session.user.id));
-
-  if (error) {
-    return { error: error.message || 'Failed to fetch your custom exercises' };
-  }
-
-  return { success: true, data: exercises };
-});
-
-export async function getBuiltInExercisesAction() {
-  const [error, exercises] = await to(getBuiltInExercises());
-
-  if (error) {
-    return { error: error.message || 'Failed to fetch built-in exercises' };
-  }
-
-  return { success: true, data: exercises };
-}

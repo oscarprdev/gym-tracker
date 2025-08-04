@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { CreateWorkoutSidebar } from './create-workout-sidebar';
 import { ExerciseSelectionSidebar } from './exercise-selection-sidebar';
 import { ExerciseEditSidebar } from './exercise-edit-sidebar';
@@ -26,17 +26,22 @@ interface WorkoutBuilderProps {
   exercises: Exercise[];
   onWorkoutCreated: (workout: { name: string; exercises: WorkoutExerciseConfig[] }) => void;
   trigger?: React.ReactNode;
+  initialWorkout?: {
+    name: string;
+    exercises: WorkoutExerciseConfig[];
+  };
 }
 
-export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: WorkoutBuilderProps) {
+export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger, initialWorkout }: WorkoutBuilderProps) {
   const [isExerciseSidebarOpen, setIsExerciseSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setIsEditSidebarOpen] = useState(false);
-  const [selectedExercises, setSelectedExercises] = useState<WorkoutExerciseConfig[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<WorkoutExerciseConfig[]>(initialWorkout?.exercises || []);
   const [editingExercise, setEditingExercise] = useState<WorkoutExerciseConfig | null>(null);
+  const [isCreateSidebarOpen, setIsCreateSidebarOpen] = useState(!!initialWorkout);
 
   const createDefaultSets = (count: number): WorkoutSetConfig[] => {
     return Array.from({ length: count }, (_, index) => ({
-      id: `set-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${index}`,
+      id: crypto.randomUUID(),
       setNumber: index + 1,
       reps: 10,
       weight: 0,
@@ -49,16 +54,17 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
 
   const handleExerciseSelected = (exercise: Exercise) => {
     const newExercise: WorkoutExerciseConfig = {
-      id: `exercise-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: crypto.randomUUID(),
       exerciseId: exercise.id,
       name: exercise.name,
       muscleGroups: exercise.muscleGroups,
       position: selectedExercises.length + 1,
       sets: createDefaultSets(3),
     };
-
-    setSelectedExercises((prev) => [...prev, newExercise]);
-    setIsExerciseSidebarOpen(false);
+    startTransition(() => {
+      setSelectedExercises((prev) => [...prev, newExercise]);
+      setIsExerciseSidebarOpen(false);
+    });
   };
 
   const handleExerciseRemoved = (exerciseId: string) => {
@@ -72,11 +78,12 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
   };
 
   const handleExerciseUpdated = (exerciseId: string, updates: Partial<WorkoutExerciseConfig>) => {
-    setSelectedExercises((prev) =>
-      prev.map((exercise) => (exercise.id === exerciseId ? { ...exercise, ...updates } : exercise))
-    );
-    // Update the editing exercise state as well
-    setEditingExercise((prev) => (prev?.id === exerciseId ? { ...prev, ...updates } : prev));
+    startTransition(() => {
+      setSelectedExercises((prev) =>
+        prev.map((exercise) => (exercise.id === exerciseId ? { ...exercise, ...updates } : exercise))
+      );
+      setEditingExercise((prev) => (prev?.id === exerciseId ? { ...prev, ...updates } : prev));
+    });
   };
 
   const handleExerciseReordered = (reorderedExercises: WorkoutExerciseConfig[]) => {
@@ -84,13 +91,18 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
   };
 
   const handleOpenEditSidebar = (exercise: WorkoutExerciseConfig) => {
-    setEditingExercise({ ...exercise }); // Create a copy to ensure proper state update
-    setIsEditSidebarOpen(true);
+    startTransition(() => {
+      setEditingExercise({ ...exercise }); // Create a copy to ensure proper state update
+      setIsEditSidebarOpen(true);
+    });
   };
 
   const handleWorkoutCreated = (workout: { name: string; exercises: WorkoutExerciseConfig[] }) => {
     onWorkoutCreated(workout);
-    setSelectedExercises([]);
+    startTransition(() => {
+      setSelectedExercises([]);
+      setIsCreateSidebarOpen(false);
+    });
   };
 
   return (
@@ -103,6 +115,9 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger }: Workout
         onExerciseRemoved={handleExerciseRemoved}
         onExerciseReordered={handleExerciseReordered}
         onOpenEditSidebar={handleOpenEditSidebar}
+        initialWorkoutName={initialWorkout?.name}
+        isOpen={isCreateSidebarOpen}
+        onOpenChange={setIsCreateSidebarOpen}
       />
 
       <ExerciseSelectionSidebar
