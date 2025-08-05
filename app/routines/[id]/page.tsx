@@ -5,6 +5,7 @@ import { getRoutineWithWorkouts } from '@/lib/db/queries/routines';
 import { EditRoutine } from '@/components/routines/edit-routine';
 import { UserMenu } from '@/components/auth/user-menu';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { RoutineActions } from '@/components/routines/routine-actions';
 import Link from 'next/link';
 import type { WeeklyWorkout } from '@/components/routines/types';
 import { getExercisesByUser } from '@/lib/db/queries';
@@ -47,14 +48,7 @@ async function EditRoutineServer({ routineId, userId }: { routineId: string; use
           <h2 className="text-3xl font-bold text-gray-900">{routine.name}</h2>
           <p className="text-gray-600 mt-2">View and edit your weekly workout routine</p>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href={`/workout/${routineId}`}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Start Workout
-          </Link>
-        </div>
+        <RoutineActions routineId={routine.id} routineName={routine.name} />
       </div>
       <EditRoutine
         routineName={routine.name}
