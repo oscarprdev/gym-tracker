@@ -1,8 +1,6 @@
 import { RoutineCard } from './routine-card';
 import { EmptyState } from '@/components/common/empty-state';
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { WorkoutBuilder } from '../routines-new/workout-builder';
 
 import type { Routine } from '@/lib/types';
 import type { Exercise } from '@/lib/db/schema/exercises';
@@ -12,28 +10,13 @@ interface RoutinesListProps {
   exercises: Exercise[];
 }
 
-export function RoutinesList({ routines, exercises }: RoutinesListProps) {
+export function RoutinesList({ routines }: RoutinesListProps) {
   if (routines.length === 0) {
     return (
       <EmptyState
         icon={<Plus className="w-12 h-12 text-gray-400" />}
         title="No routines yet"
         description="Create your first routine to start planning your workouts."
-        action={
-          <WorkoutBuilder
-            exercises={exercises}
-            onWorkoutCreated={(workout) => {
-              // This will be handled by the parent component
-              console.log('Workout created:', workout);
-            }}
-            trigger={
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Routine
-              </Button>
-            }
-          />
-        }
       />
     );
   }
