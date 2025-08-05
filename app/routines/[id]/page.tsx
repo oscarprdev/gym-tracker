@@ -6,7 +6,7 @@ import { EditRoutine } from '@/components/routines/edit-routine';
 import { UserMenu } from '@/components/auth/user-menu';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import Link from 'next/link';
-import { RoutineDetail } from '@/lib/types/routines';
+import type { WeeklyWorkout } from '@/components/routines/types';
 import { getExercisesByUser } from '@/lib/db/queries';
 
 interface RoutineDetailPageProps {
@@ -20,27 +20,25 @@ async function EditRoutineServer({ routineId, userId }: { routineId: string; use
     notFound();
   }
 
-  const routineDetail: RoutineDetail = {
-    id: routine.id,
-    userId: routine.userId,
-    name: routine.name,
-    description: routine.description,
-    color: routine.color,
-    createdAt: routine.createdAt,
-    updatedAt: routine.updatedAt,
-    workouts: routine.workouts.map((workout) => ({
-      id: workout.id,
-      name: workout.name,
-      dayOfWeek: workout.dayOfWeek,
-      order: workout.order,
-      exercises: workout.exercises.map((workoutExercise) => ({
-        id: workoutExercise.id,
-        order: workoutExercise.order,
-        exercise: workoutExercise.exercise,
-        sets: workoutExercise.sets,
+  // Transform routine workouts to WeeklyWorkout format for the component
+  const weeklyWorkouts: WeeklyWorkout[] = routine.workouts.map((workout) => ({
+    id: workout.id,
+    name: workout.name,
+    dayOfWeek: workout.dayOfWeek || 0,
+    exercises: workout.exercises.map((workoutExercise) => ({
+      id: workoutExercise.id,
+      exerciseId: workoutExercise.exercise.id,
+      name: workoutExercise.exercise.name,
+      muscleGroups: workoutExercise.exercise.muscleGroups,
+      position: workoutExercise.order + 1, // Convert from 0-based to 1-based
+      sets: workoutExercise.sets.map((set) => ({
+        id: set.id,
+        setNumber: set.setNumber,
+        reps: set.reps || undefined,
+        weight: set.weight,
       })),
     })),
-  };
+  }));
 
   return (
     <div className="space-y-6">
@@ -58,7 +56,12 @@ async function EditRoutineServer({ routineId, userId }: { routineId: string; use
           </Link>
         </div>
       </div>
-      <EditRoutine routineDetail={routineDetail} exercises={exercises} />;
+      <EditRoutine
+        routineName={routine.name}
+        routineId={routine.id}
+        weeklyWorkouts={weeklyWorkouts}
+        exercises={exercises}
+      />
     </div>
   );
 }

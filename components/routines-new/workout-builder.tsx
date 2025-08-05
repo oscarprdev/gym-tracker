@@ -4,33 +4,8 @@ import { startTransition, useState } from 'react';
 import { CreateWorkoutSidebar } from './create-workout-sidebar';
 import { ExerciseSelectionSidebar } from './exercise-selection-sidebar';
 import { ExerciseEditSidebar } from './exercise-edit-sidebar';
-import type { Exercise } from '@/lib/db/schema/exercises';
-
-export interface WorkoutExerciseConfig {
-  id: string;
-  exerciseId: string;
-  name: string;
-  muscleGroups: string[];
-  position: number;
-  sets: WorkoutSetConfig[];
-}
-
-export interface WorkoutSetConfig {
-  id: string;
-  setNumber: number;
-  reps?: number;
-  weight: number;
-}
-
-interface WorkoutBuilderProps {
-  exercises: Exercise[];
-  onWorkoutCreated: (workout: { name: string; exercises: WorkoutExerciseConfig[] }) => void;
-  trigger?: React.ReactNode;
-  initialWorkout?: {
-    name: string;
-    exercises: WorkoutExerciseConfig[];
-  };
-}
+import type { WorkoutBuilderProps } from './workout-builder.types';
+import type { WorkoutExerciseConfig, WorkoutSetConfig } from './types';
 
 export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger, initialWorkout }: WorkoutBuilderProps) {
   const [isExerciseSidebarOpen, setIsExerciseSidebarOpen] = useState(false);

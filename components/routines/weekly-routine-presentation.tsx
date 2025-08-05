@@ -6,28 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar, Plus, X, Dumbbell, Target, Clock, CalendarDays, Edit } from 'lucide-react';
-import { WorkoutBuilder, type WorkoutExerciseConfig } from '../routines-new/workout-builder';
+import { WorkoutBuilder } from '../routines-new/workout-builder';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import type { Exercise } from '@/lib/db/schema/exercises';
-
-export interface WeeklyWorkout {
-  id: string;
-  name: string;
-  dayOfWeek: number; // 0 = Sunday, 1 = Monday, etc.
-  exercises: WorkoutExerciseConfig[];
-}
-
-interface WeeklyRoutinePresentationProps {
-  exercises: Exercise[];
-  routineName: string;
-  onRoutineNameChange: (name: string) => void;
-  weeklyWorkouts: WeeklyWorkout[];
-  onWeeklyWorkoutsChange: (workouts: WeeklyWorkout[]) => void;
-  onWorkoutUpdated: (workoutId: string, workout: { name: string; exercises: WorkoutExerciseConfig[] }) => void;
-  onWorkoutRemoved: (workoutId: string) => void;
-  isPending?: boolean;
-  mode: 'create' | 'edit';
-}
+import type { WeeklyRoutinePresentationProps } from './weekly-routine-presentation.types';
+import type { WeeklyWorkout, WorkoutExerciseConfig } from './types';
 
 const DAYS_OF_WEEK = [
   { value: 1, label: 'Monday', shortLabel: 'Mon' },

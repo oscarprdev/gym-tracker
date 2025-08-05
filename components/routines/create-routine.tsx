@@ -2,19 +2,10 @@
 
 import { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { WeeklyRoutinePresentation, type WeeklyWorkout } from './weekly-routine-presentation';
+import { WeeklyRoutinePresentation } from './weekly-routine-presentation';
 import { createWeeklyRoutineAction } from '@/app/routines/new/actions';
-import { type WorkoutExerciseConfig } from '../routines-new/workout-builder';
-import type { Exercise } from '@/lib/db/schema/exercises';
-
-interface CreateRoutineProps {
-  exercises: Exercise[];
-}
-
-type FormState = {
-  error: string | null;
-  fieldErrors?: Record<string, string[]>;
-};
+import type { CreateRoutineProps, FormState } from './create-routine.types';
+import type { WeeklyWorkout, WorkoutExerciseConfig } from './types';
 
 const initialState: FormState = {
   error: null,

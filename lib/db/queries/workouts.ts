@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { db } from '../client';
 import { workouts, workoutExercises, workoutExerciseSets } from '../schema/workouts';
 
@@ -54,8 +55,28 @@ export const WORKOUTS = {
 
     return result;
   },
+  DELETE: async (workoutId: string) => {
+    await Promise.all([
+      db.delete(workoutExercises).where(eq(workoutExercises.workoutId, workoutId)),
+      db.delete(workoutExerciseSets).where(eq(workoutExerciseSets.workoutExerciseId, workoutId)),
+      db.delete(workouts).where(eq(workouts.id, workoutId)),
+    ]);
+  },
+
+  DELETE_BY_ROUTINE: async (routineId: string) => {
+    const workoutIds = await db.query.workouts.findMany({
+      where: eq(workouts.routineId, routineId),
+      columns: { id: true },
+    });
+
+    for (const workout of workoutIds) {
+      await WORKOUTS.DELETE(workout.id);
+    }
+  },
 };
 
 export const createWorkout = WORKOUTS.CREATE;
 export const addExerciseToWorkout = WORKOUTS.ADD_EXERCISE;
 export const addSetsToWorkoutExercise = WORKOUTS.ADD_SETS;
+export const deleteWorkout = WORKOUTS.DELETE;
+export const deleteWorkoutsByRoutine = WORKOUTS.DELETE_BY_ROUTINE;

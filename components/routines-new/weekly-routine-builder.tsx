@@ -7,27 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import { Calendar, Plus, X, Dumbbell, Target, Clock, CalendarDays, GripVertical } from 'lucide-react';
-import { WorkoutBuilder, type WorkoutExerciseConfig } from './workout-builder';
+import { WorkoutBuilder } from './workout-builder';
 import { createWeeklyRoutineAction } from '@/app/routines/new/actions';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import type { WeeklyWorkout, WorkoutExerciseConfig, FormState } from './types';
 import type { Exercise } from '@/lib/db/schema/exercises';
-
-export interface WeeklyWorkout {
-  id: string;
-  name: string;
-  dayOfWeek: number; // 0 = Sunday, 1 = Monday, etc.
-  exercises: WorkoutExerciseConfig[];
-}
 
 interface WeeklyRoutineBuilderProps {
   exercises: Exercise[];
   userId: string;
 }
-
-type FormState = {
-  error: string | null;
-  fieldErrors?: Record<string, string[]>;
-};
 
 const DAYS_OF_WEEK = [
   { value: 1, label: 'Monday', shortLabel: 'Mon' },

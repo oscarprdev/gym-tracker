@@ -11,22 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { GripVertical, Plus, X, Dumbbell, Target, Edit } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { getMuscleGroupColor } from '@/lib/utils/muscle-groups';
-
-export interface WorkoutExerciseConfig {
-  id: string;
-  exerciseId: string;
-  name: string;
-  muscleGroups: string[];
-  position: number;
-  sets: WorkoutSetConfig[];
-}
-
-export interface WorkoutSetConfig {
-  id: string;
-  setNumber: number;
-  reps?: number;
-  weight: number;
-}
+import type { WorkoutExerciseConfig } from './types';
 
 interface CreateWorkoutSidebarProps {
   selectedExercises: WorkoutExerciseConfig[];

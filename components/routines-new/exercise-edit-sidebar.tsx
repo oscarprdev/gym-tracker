@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, X, ArrowLeft } from 'lucide-react';
 import { getMuscleGroupColor } from '@/lib/utils/muscle-groups';
-import type { WorkoutExerciseConfig, WorkoutSetConfig } from './create-workout-sidebar';
+import type { WorkoutExerciseConfig, WorkoutSetConfig } from './types';
 
 interface ExerciseEditSidebarProps {
   isOpen: boolean;

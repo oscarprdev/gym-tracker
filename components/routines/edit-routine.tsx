@@ -2,30 +2,24 @@
 
 import { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { WeeklyRoutinePresentation, type WeeklyWorkout } from './weekly-routine-presentation';
+import { WeeklyRoutinePresentation } from './weekly-routine-presentation';
 import { updateRoutineAction } from '@/app/routines/[id]/actions';
-import { type WorkoutExerciseConfig } from '../routines-new/workout-builder';
-import { RoutineDetail } from '@/lib/types/routines';
-import type { Exercise } from '@/lib/db/schema/exercises';
-
-interface EditRoutineProps {
-  routineDetail: RoutineDetail;
-  exercises: Exercise[];
-}
-
-type FormState = {
-  error: string | null;
-  fieldErrors?: Record<string, string[]>;
-};
+import type { EditRoutineProps, FormState } from './edit-routine.types';
+import type { WeeklyWorkout, WorkoutExerciseConfig } from './types';
 
 const initialState: FormState = {
   error: null,
   fieldErrors: {},
 };
 
-export function EditRoutine({ routineDetail, exercises }: EditRoutineProps) {
-  const [routineName, setRoutineName] = useState(routineDetail.name);
-  const [weeklyWorkouts, setWeeklyWorkouts] = useState<WeeklyWorkout[]>([]);
+export function EditRoutine({
+  routineName: initialRoutineName,
+  routineId,
+  weeklyWorkouts: initialWeeklyWorkouts,
+  exercises,
+}: EditRoutineProps) {
+  const [routineName, setRoutineName] = useState(initialRoutineName);
+  const [weeklyWorkouts, setWeeklyWorkouts] = useState<WeeklyWorkout[]>(initialWeeklyWorkouts);
 
   const wrappedAction = async (prevState: FormState, formData: FormData): Promise<FormState> => {
     formData.append(
@@ -35,7 +29,7 @@ export function EditRoutine({ routineDetail, exercises }: EditRoutineProps) {
         workouts: weeklyWorkouts,
       })
     );
-    formData.append('routineId', routineDetail.id);
+    formData.append('routineId', routineId);
     return await updateRoutineAction(prevState, formData);
   };
 
