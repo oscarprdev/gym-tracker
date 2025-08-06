@@ -24,13 +24,6 @@ export interface WeeklyWorkout {
   exercises: WorkoutExerciseConfig[];
 }
 
-// Exercise reference from database schema - import from actual schema
-// export interface Exercise {
-//   id: string;
-//   name: string;
-//   muscleGroups: string[];
-// }
-
 // Database routine structure (for pages and server components)
 export interface WorkoutExerciseSet {
   id: string;
