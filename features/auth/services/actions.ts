@@ -71,5 +71,5 @@ export async function registerAction(prevState: RegisterState | null, formData: 
     };
   }
 
-  redirect('/auth/login');
+  redirect('/login');
 }

@@ -43,7 +43,7 @@ export function handleValidationError<T>(
 export function protectedAction<T extends unknown[], R>(
   action: (session: Awaited<ReturnType<typeof requireAuth>>, ...args: T) => Promise<R>
 ) {
-  return async (...args: T): Promise<R | { error: string | null }> => {
+  return async (...args: T): Promise<R | ValidationErrorResult> => {
     const [sessionError, session] = await to(requireAuth());
     if (sessionError || !session) {
       return { error: 'Authentication required' };

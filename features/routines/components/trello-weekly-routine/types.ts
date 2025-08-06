@@ -32,7 +32,7 @@ export interface WorkoutContextAction {
   disabled?: boolean;
 }
 
-// Drag and drop state management
+// Drag and drop state management (DEPRECATED - kept for backwards compatibility)
 export interface DragState {
   isDragging: boolean;
   draggedItem: TrelloWorkoutCard | null;
@@ -41,7 +41,15 @@ export interface DragState {
   dragStartTime: number | null;
 }
 
-// Enhanced drag result with additional metadata
+// Select-based UI state management
+export interface SelectState {
+  isChangingDay: boolean;
+  changingWorkoutId: string | null;
+  pendingChanges: Record<string, number>; // workoutId -> newDay
+  errors: Record<string, string>; // workoutId -> error message
+}
+
+// Enhanced drag result with additional metadata (DEPRECATED - kept for backwards compatibility)
 export interface EnhancedDropResult {
   draggableId: string;
   type: string;
@@ -56,6 +64,18 @@ export interface EnhancedDropResult {
   reason: 'DROP' | 'CANCEL';
   mode: 'FLUID' | 'SNAP';
 }
+
+// Optimistic update result for error handling
+export interface OptimisticUpdateResult<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  rollbackData?: T;
+}
+
+// Handler types for new select-based operations
+export type WorkoutDayChangeHandler = (workoutId: string, newDay: number) => void | Promise<void>;
+export type CreateWorkoutForDayHandler = (dayOfWeek: number) => void | Promise<void>;
 
 // Responsive layout configuration
 export interface TrelloLayoutConfig {
@@ -94,21 +114,31 @@ export interface TrelloWeeklyRoutineProps {
   isPending?: boolean;
   mode: 'create' | 'edit';
   enableContextMenu?: boolean;
-  enableDragDrop?: boolean;
+  enableDragDrop?: boolean; // Deprecated - kept for backwards compatibility
   showRoutineSummary?: boolean;
+}
+
+// Day information for dropdowns and selection
+export interface DayInfo {
+  value: number;
+  label: string;
+  shortLabel: string;
 }
 
 // Workout card component props
 export interface TrelloWorkoutCardProps {
   workout: TrelloWorkoutCard;
-  index: number;
+  index: number; // Kept for backwards compatibility
   dayOfWeek: number;
-  isDragging?: boolean;
-  onEdit: (workout: TrelloWorkoutCard) => void;
+  isDragging?: boolean; // Deprecated - kept for backwards compatibility
+  onEdit: (workout: { id: string }) => void; // Fixed to match actual usage
   onDelete: (workoutId: string) => void;
   onDuplicate?: (workoutId: string) => void;
-  onMove?: (workoutId: string, targetDay: number) => void;
+  onDayChange?: (workoutId: string, newDay: number) => void;
+  availableDays?: DayInfo[];
   enableContextMenu?: boolean;
+  isChangingDay?: boolean;
+  error?: string | null;
   className?: string;
 }
 
@@ -117,8 +147,13 @@ export interface TrelloDayColumnProps {
   day: TrelloDayColumn;
   workouts: TrelloWorkoutCard[];
   onWorkoutAction: (action: WorkoutContextAction, workoutId: string) => void;
-  isDraggedOver?: boolean;
-  enableDropping?: boolean;
+  onWorkoutDayChange?: (workoutId: string, newDay: number) => void;
+  onCreateWorkoutForDay?: (dayOfWeek: number) => void;
+  availableDays?: DayInfo[];
+  changingWorkoutId?: string | null;
+  dayChangeError?: string | null;
+  isDraggedOver?: boolean; // Deprecated - kept for backwards compatibility
+  enableDropping?: boolean; // Deprecated - kept for backwards compatibility
   className?: string;
 }
 
@@ -139,12 +174,19 @@ export interface MuscleGroupBadgeProps {
   className?: string;
 }
 
-// Visual feedback component props
+// Visual feedback component props (DEPRECATED - kept for backwards compatibility)
 export interface DragVisualFeedbackProps {
   isDragging: boolean;
   draggedItem: TrelloWorkoutCard | null;
   draggedOverColumn: number | null;
   children: React.ReactNode;
+}
+
+// Error handling props for optimistic updates
+export interface ErrorFeedbackProps {
+  error: string | null;
+  onRetry?: () => void;
+  onDismiss?: () => void;
 }
 
 // Utility types for muscle group operations
@@ -159,10 +201,12 @@ export interface MuscleGroupConfig {
 
 // Animation and transition configurations
 export interface TrelloAnimationConfig {
-  dragDuration: number;
-  dropDuration: number;
+  dragDuration: number; // Deprecated
+  dropDuration: number; // Deprecated
   cardHover: string;
   columnHighlight: string;
   fadeIn: string;
   slideIn: string;
+  selectTransition: string;
+  dayChangeTransition: string;
 }

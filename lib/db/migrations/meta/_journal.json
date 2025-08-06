@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1754209199084,
-      "tag": "0000_closed_marvel_apes",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1754236802791,
-      "tag": "0001_dashing_omega_sentinel",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1754238775111,
-      "tag": "0002_yellow_gravity",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1754323520093,
-      "tag": "0003_chief_miss_america",
+      "when": 1754513886671,
+      "tag": "0000_brief_ben_urich",
       "breakpoints": true
     }
   ]

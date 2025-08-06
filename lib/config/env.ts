@@ -8,14 +8,14 @@ export const env = createEnv({
    */
   server: {
     // Database Configuration
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: z.url(),
 
     // Supabase Server Configuration
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 
     // Authentication Configuration
     BETTER_AUTH_SECRET: z.string().min(32),
-    BETTER_AUTH_URL: z.string().url(),
+    BETTER_AUTH_URL: z.url(),
 
     // Node Environment
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -27,11 +27,11 @@ export const env = createEnv({
    */
   client: {
     // Supabase Client Configuration
-    NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+    NEXT_PUBLIC_SUPABASE_URL: z.url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
 
     // App Configuration
-    NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_APP_URL: z.url(),
   },
 
   /*

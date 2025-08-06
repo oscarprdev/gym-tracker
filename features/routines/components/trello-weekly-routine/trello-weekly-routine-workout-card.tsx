@@ -1,26 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Draggable } from '@hello-pangea/dnd';
-import { MoreHorizontal, Target, Clock } from 'lucide-react';
+import React, { useState, memo } from 'react';
+import { MoreHorizontal, Target, Clock, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/features/shared/components/ui/card';
 import { Button } from '@/features/shared/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/features/shared/components/ui/select';
 import { cn } from '@/lib/utils/cn';
 import { MuscleGroupBadgeList } from './trello-weekly-routine-muscle-group-badge';
 import { WorkoutContextMenu } from './trello-weekly-routine-workout-context-menu';
 import { extractMuscleGroups } from './utils/muscle-group-colors';
 import type { TrelloWorkoutCardProps, WorkoutContextAction } from './types';
 
-export function TrelloWorkoutCard({
+export const TrelloWorkoutCard = memo<TrelloWorkoutCardProps>(function TrelloWorkoutCard({
   workout,
-  index,
-  isDragging = false,
+  index: _index, // Keep for backwards compatibility but no longer used
+  isDragging: _isDragging = false, // Deprecated
   onEdit,
   onDelete,
   onDuplicate,
+  onDayChange,
+  availableDays = [],
   enableContextMenu = true,
+  isChangingDay = false,
+  error = null,
   className,
-}: TrelloWorkoutCardProps) {
+}) {
   const [, setIsContextMenuOpen] = useState(false);
 
   // Extract muscle groups from exercises
@@ -28,7 +32,6 @@ export function TrelloWorkoutCard({
 
   // Calculate workout stats
   const totalExercises = workout.exercises.length;
-  // const totalSets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
   const estimatedDuration = totalExercises * 5; // 5 minutes per exercise estimate
 
   // Define context menu actions
@@ -87,7 +90,7 @@ export function TrelloWorkoutCard({
   const handleContextAction = (action: WorkoutContextAction, workoutId: string) => {
     switch (action.type) {
       case 'edit':
-        onEdit(workout);
+        onEdit({ id: workout.id });
         break;
       case 'delete':
         onDelete(workoutId);
@@ -102,13 +105,20 @@ export function TrelloWorkoutCard({
     setIsContextMenuOpen(false);
   };
 
-  const cardContent = (
+  const handleDayChange = (newDay: string) => {
+    const dayValue = parseInt(newDay);
+    onDayChange?.(workout.id, dayValue);
+  };
+
+  const currentDay = availableDays.find((day) => day.value === workout.dayOfWeek);
+
+  return (
     <Card
       className={cn(
-        'group relative transition-all duration-200 cursor-move',
+        'group relative transition-all duration-200',
         'hover:shadow-md hover:border-gray-300',
         'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
-        isDragging && 'shadow-lg ring-2 ring-blue-500 ring-opacity-50 rotate-2',
+        'mb-2 last:mb-0',
         className
       )}
     >
@@ -137,8 +147,9 @@ export function TrelloWorkoutCard({
                       e.stopPropagation();
                       setIsContextMenuOpen(true);
                     }}
+                    aria-label={`More actions for ${workout.name}`}
                   >
-                    <MoreHorizontal className="h-3 w-3" />
+                    <MoreHorizontal className="h-3 w-3" aria-hidden="true" />
                   </Button>
                 }
                 align="end"
@@ -146,6 +157,48 @@ export function TrelloWorkoutCard({
             </div>
           )}
         </div>
+
+        {/* Day Selection Dropdown */}
+        <div className="flex items-center gap-2">
+          <Calendar className="h-3 w-3 text-gray-500" aria-hidden="true" />
+          <Select value={workout.dayOfWeek.toString()} onValueChange={handleDayChange} disabled={isChangingDay}>
+            <SelectTrigger
+              className="h-7 text-xs w-auto min-w-[80px]"
+              size="sm"
+              aria-label={`Change workout day from ${currentDay?.label || 'current day'}`}
+            >
+              <SelectValue placeholder="Select day">
+                {isChangingDay ? 'Changing...' : currentDay?.shortLabel || 'Day'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {availableDays.map((day) => (
+                <SelectItem key={day.value} value={day.value.toString()} aria-label={`Move workout to ${day.label}`}>
+                  {day.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div
+            className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400"
+            role="alert"
+            aria-live="polite"
+          >
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
 
         {/* Body: Muscle group badges */}
         {muscleGroups.length > 0 && (
@@ -176,37 +229,19 @@ export function TrelloWorkoutCard({
       </CardContent>
     </Card>
   );
-
-  return (
-    <Draggable draggableId={workout.id} index={index}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={cn('mb-2 last:mb-0', snapshot.isDragging && 'z-50')}
-          style={{
-            ...provided.draggableProps.style,
-            // Enhanced drag styling
-            transform: snapshot.isDragging
-              ? `${provided.draggableProps.style?.transform} rotate(5deg) scale(1.02)`
-              : provided.draggableProps.style?.transform,
-          }}
-        >
-          {cardContent}
-        </div>
-      )}
-    </Draggable>
-  );
-}
+});
 
 // Empty state component for when a day has no workouts
-export function TrelloWorkoutCardEmpty({ dayLabel }: { dayLabel: string }) {
+export function TrelloWorkoutCardEmpty({ dayLabel, onAddWorkout }: { dayLabel: string; onAddWorkout?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[120px] p-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50 transition-colors duration-200">
       <Target className="h-8 w-8 text-gray-400 dark:text-gray-500 mb-2" />
-      <p className="text-sm text-gray-500 dark:text-gray-400 text-center">Drop workout here</p>
-      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{dayLabel}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">No workouts on {dayLabel}</p>
+      {onAddWorkout && (
+        <Button variant="ghost" size="sm" onClick={onAddWorkout} className="text-xs text-gray-500 hover:text-gray-700">
+          Add workout here
+        </Button>
+      )}
     </div>
   );
 }
