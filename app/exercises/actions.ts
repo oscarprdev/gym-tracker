@@ -3,7 +3,12 @@
 import { revalidatePath } from 'next/cache';
 import { to, toSync, handleValidationError, protectedAction } from '@/lib/utils/error-handler';
 import { parseCreateExercise, parseUpdateExercise } from '@/lib/validations/exercises';
-import { createExercise, updateExercise, deleteExercise } from '@/lib/db/queries/exercises';
+import {
+  createExercise,
+  updateExercise,
+  deleteExercise,
+  getExercisesByUserAndMuscleGroups,
+} from '@/lib/db/queries/exercises';
 
 export const createExerciseAction = protectedAction(
   async (session, prevState: { error: string | null; fieldErrors?: Record<string, string[]> }, formData: FormData) => {
@@ -75,4 +80,14 @@ export const deleteExerciseAction = protectedAction(async (session, exerciseId: 
 
   revalidatePath('/exercises');
   return { success: true, error: null };
+});
+
+export const getExercisesByMuscleGroupsAction = protectedAction(async (session, muscleGroups: string[]) => {
+  const [fetchError, exercises] = await to(getExercisesByUserAndMuscleGroups(session.user.id, muscleGroups));
+
+  if (fetchError) {
+    return { error: fetchError.message || 'Failed to fetch exercises', exercises: [], success: false };
+  }
+
+  return { exercises: exercises || [], error: null, success: true };
 });

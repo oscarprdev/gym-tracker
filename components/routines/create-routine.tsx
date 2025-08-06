@@ -12,7 +12,7 @@ const initialState: FormState = {
   fieldErrors: {},
 };
 
-export function CreateRoutine({ exercises }: CreateRoutineProps) {
+export function CreateRoutine({}: CreateRoutineProps) {
   const [routineName, setRoutineName] = useState('');
   const [weeklyWorkouts, setWeeklyWorkouts] = useState<WeeklyWorkout[]>([]);
 
@@ -50,7 +50,6 @@ export function CreateRoutine({ exercises }: CreateRoutineProps) {
   return (
     <div className="space-y-6">
       <WeeklyRoutinePresentation
-        exercises={exercises}
         routineName={routineName}
         onRoutineNameChange={setRoutineName}
         weeklyWorkouts={weeklyWorkouts}

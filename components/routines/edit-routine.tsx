@@ -16,7 +16,6 @@ export function EditRoutine({
   routineName: initialRoutineName,
   routineId,
   weeklyWorkouts: initialWeeklyWorkouts,
-  exercises,
 }: EditRoutineProps) {
   const [routineName, setRoutineName] = useState(initialRoutineName);
   const [weeklyWorkouts, setWeeklyWorkouts] = useState<WeeklyWorkout[]>(initialWeeklyWorkouts);
@@ -56,7 +55,6 @@ export function EditRoutine({
   return (
     <div className="space-y-6">
       <WeeklyRoutinePresentation
-        exercises={exercises}
         routineName={routineName}
         onRoutineNameChange={setRoutineName}
         weeklyWorkouts={weeklyWorkouts}

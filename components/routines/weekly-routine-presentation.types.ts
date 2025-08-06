@@ -1,9 +1,7 @@
 // Types specific to weekly-routine-presentation.tsx component
 import type { WeeklyWorkout, WorkoutExerciseConfig } from './types';
-import type { Exercise } from '@/lib/db/schema/exercises';
 
 export interface WeeklyRoutinePresentationProps {
-  exercises: Exercise[];
   routineName: string;
   onRoutineNameChange: (name: string) => void;
   weeklyWorkouts: WeeklyWorkout[];

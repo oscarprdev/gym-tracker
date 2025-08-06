@@ -22,7 +22,6 @@ const DAYS_OF_WEEK = [
 ];
 
 export function WeeklyRoutinePresentation({
-  exercises,
   routineName,
   onRoutineNameChange,
   weeklyWorkouts,
@@ -168,7 +167,6 @@ export function WeeklyRoutinePresentation({
         </CardHeader>
         <CardContent>
           <WorkoutBuilder
-            exercises={exercises}
             onWorkoutCreated={handleWorkoutCreated}
             trigger={
               <Button type="button" className="w-full" disabled={isPending}>
@@ -323,9 +321,7 @@ export function WeeklyRoutinePresentation({
       </Card>
 
       {/* Workout Edit Sidebar */}
-      {editingWorkout && (
-        <WorkoutBuilder exercises={exercises} onWorkoutCreated={handleWorkoutUpdated} initialWorkout={editingWorkout} />
-      )}
+      {editingWorkout && <WorkoutBuilder onWorkoutCreated={handleWorkoutUpdated} initialWorkout={editingWorkout} />}
     </div>
   );
 }

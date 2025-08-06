@@ -6,8 +6,9 @@ import { ExerciseSelectionSidebar } from './exercise-selection-sidebar';
 import { ExerciseEditSidebar } from './exercise-edit-sidebar';
 import type { WorkoutBuilderProps } from './workout-builder.types';
 import type { WorkoutExerciseConfig, WorkoutSetConfig } from './types';
+import type { Exercise } from '@/lib/db/schema/exercises';
 
-export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger, initialWorkout }: WorkoutBuilderProps) {
+export function WorkoutBuilder({ onWorkoutCreated, trigger, initialWorkout }: WorkoutBuilderProps) {
   const [isExerciseSidebarOpen, setIsExerciseSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setIsEditSidebarOpen] = useState(false);
   const [selectedExercises, setSelectedExercises] = useState<WorkoutExerciseConfig[]>(initialWorkout?.exercises || []);
@@ -98,7 +99,6 @@ export function WorkoutBuilder({ exercises, onWorkoutCreated, trigger, initialWo
       <ExerciseSelectionSidebar
         isOpen={isExerciseSidebarOpen}
         onOpenChange={setIsExerciseSidebarOpen}
-        exercises={exercises}
         onExerciseSelected={handleExerciseSelected}
       />
 

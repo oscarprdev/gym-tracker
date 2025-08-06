@@ -8,14 +8,13 @@ import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { RoutineActions } from '@/components/routines/routine-actions';
 import Link from 'next/link';
 import type { WeeklyWorkout } from '@/components/routines/types';
-import { getExercisesByUser } from '@/lib/db/queries';
 
 interface RoutineDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
 async function EditRoutineServer({ routineId, userId }: { routineId: string; userId: string }) {
-  const [routine, exercises] = await Promise.all([getRoutineWithWorkouts(routineId), getExercisesByUser(userId)]);
+  const routine = await getRoutineWithWorkouts(routineId);
 
   if (!routine || routine.userId !== userId) {
     notFound();
@@ -50,12 +49,7 @@ async function EditRoutineServer({ routineId, userId }: { routineId: string; use
         </div>
         <RoutineActions routineId={routine.id} routineName={routine.name} />
       </div>
-      <EditRoutine
-        routineName={routine.name}
-        routineId={routine.id}
-        weeklyWorkouts={weeklyWorkouts}
-        exercises={exercises}
-      />
+      <EditRoutine routineName={routine.name} routineId={routine.id} weeklyWorkouts={weeklyWorkouts} />
     </div>
   );
 }

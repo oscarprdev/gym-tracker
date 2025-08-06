@@ -11,12 +11,8 @@ import { WorkoutBuilder } from './workout-builder';
 import { createWeeklyRoutineAction } from '@/app/routines/new/actions';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import type { WeeklyWorkout, WorkoutExerciseConfig, FormState } from './types';
-import type { Exercise } from '@/lib/db/schema/exercises';
 
-interface WeeklyRoutineBuilderProps {
-  exercises: Exercise[];
-  userId: string;
-}
+type WeeklyRoutineBuilderProps = Record<string, never>;
 
 const DAYS_OF_WEEK = [
   { value: 1, label: 'Monday', shortLabel: 'Mon' },
@@ -28,7 +24,7 @@ const DAYS_OF_WEEK = [
   { value: 0, label: 'Sunday', shortLabel: 'Sun' },
 ];
 
-export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRoutineBuilderProps) {
+export function WeeklyRoutineBuilder({}: WeeklyRoutineBuilderProps) {
   const [routineName, setRoutineName] = useState('');
   const [weeklyWorkouts, setWeeklyWorkouts] = useState<WeeklyWorkout[]>([]);
 
@@ -187,7 +183,6 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
               </div>
             </div>
             <WorkoutBuilder
-              exercises={exercises}
               onWorkoutCreated={handleWorkoutCreated}
               trigger={
                 <Button type="button" disabled={isPending}>
@@ -205,7 +200,6 @@ export function WeeklyRoutineBuilder({ exercises, userId: _userId }: WeeklyRouti
               <h3 className="text-lg font-medium mb-2">No workouts scheduled</h3>
               <p className="mb-4">Create your first workout to get started with your weekly routine.</p>
               <WorkoutBuilder
-                exercises={exercises}
                 onWorkoutCreated={handleWorkoutCreated}
                 trigger={
                   <Button type="button" disabled={isPending}>
