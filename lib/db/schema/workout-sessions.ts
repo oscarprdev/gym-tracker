@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, integer } from 'drizzle-orm/pg-core';
 import { users } from './auth';
 import { workouts } from './workouts';
 
@@ -14,6 +14,10 @@ export const workoutSessions = pgTable('workout_sessions', {
   status: text('status', {
     enum: ['planned', 'in_progress', 'completed', 'skipped'],
   }).default('planned'),
+  scheduledDate: timestamp('scheduled_date'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  durationMinutes: integer('duration_minutes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

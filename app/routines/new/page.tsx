@@ -1,25 +1,22 @@
 import { Metadata } from 'next';
 import { requireAuth } from '@/lib/auth/dal';
-import { UserMenu } from '@/components/auth/user-menu';
-import { CreateRoutine } from '@/components/routines/create-routine';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { CreateRoutine } from '@/features/routines/components/create-routine';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { LoadingSpinner } from '@/components/common/loading-spinner';
-import { getExercisesByUser } from '@/lib/db/queries/exercises';
+import { LoadingSpinner } from '@/features/shared/components/common/loading-spinner';
 
 export const metadata: Metadata = {
   title: 'Create New Routine | Gym Tracker',
   description: 'Create a new workout routine with weekly scheduling',
 };
 
-async function CreateRoutineServer({ userId }: { userId: string }) {
-  const exercises = await getExercisesByUser(userId);
-
-  return <CreateRoutine exercises={exercises} />;
+async function CreateRoutineServer() {
+  return <CreateRoutine />;
 }
 
 export default async function NewRoutinePage() {
-  const session = await requireAuth();
+  await requireAuth();
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
@@ -46,7 +43,7 @@ export default async function NewRoutinePage() {
           </div>
 
           <Suspense fallback={<LoadingSpinner />}>
-            <CreateRoutineServer userId={session.user.id} />
+            <CreateRoutineServer />
           </Suspense>
         </div>
       </main>

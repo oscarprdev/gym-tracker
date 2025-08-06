@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 // Import env here to validate during build
-import './config/env';
+import './lib/config/env';
 
 const nextConfig: NextConfig = {
   /* config options here */

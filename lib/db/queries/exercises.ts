@@ -1,6 +1,6 @@
 import { db } from '../client';
 import { exercises } from '../schema/exercises';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, arrayOverlaps } from 'drizzle-orm';
 import type { Exercise, NewExercise } from '../schema/exercises';
 
 export const EXERCISES = {
@@ -55,10 +55,36 @@ export const EXERCISES = {
       .returning({ id: exercises.id });
     if (result.length === 0) throw new Error('Exercise not found or unauthorized');
   },
+
+  GET_BY_USER_AND_MUSCLE_GROUPS: async (userId: string, muscleGroups: string[]): Promise<Exercise[]> => {
+    if (muscleGroups.length === 0) {
+      return [];
+    }
+
+    const result = await db.query.exercises.findMany({
+      where: and(eq(exercises.createdBy, userId), arrayOverlaps(exercises.muscleGroups, muscleGroups)),
+      orderBy: (exercises, { desc }) => [desc(exercises.createdAt)],
+      limit: 10,
+    });
+
+    return result;
+  },
+
+  GET_BY_USER_DEFAULT: async (userId: string): Promise<Exercise[]> => {
+    const result = await db.query.exercises.findMany({
+      where: eq(exercises.createdBy, userId),
+      orderBy: (exercises, { desc }) => [desc(exercises.createdAt)],
+      limit: 10,
+    });
+
+    return result;
+  },
 };
 
 export const createExercise = EXERCISES.CREATE;
 export const getExerciseById = EXERCISES.GET_BY_ID;
 export const getExercisesByUser = EXERCISES.GET_BY_USER;
+export const getExercisesByUserAndMuscleGroups = EXERCISES.GET_BY_USER_AND_MUSCLE_GROUPS;
+export const getExercisesByUserDefault = EXERCISES.GET_BY_USER_DEFAULT;
 export const updateExercise = EXERCISES.UPDATE;
 export const deleteExercise = EXERCISES.DELETE;

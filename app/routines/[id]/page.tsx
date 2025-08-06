@@ -2,20 +2,19 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { requireAuth } from '@/lib/auth/dal';
 import { getRoutineWithWorkouts } from '@/lib/db/queries/routines';
-import { EditRoutine } from '@/components/routines/edit-routine';
-import { UserMenu } from '@/components/auth/user-menu';
-import { LoadingSpinner } from '@/components/common/loading-spinner';
-import { RoutineActions } from '@/components/routines/routine-actions';
+import { EditRoutine } from '@/features/routines/components/edit-routine';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { LoadingSpinner } from '@/features/shared/components/common/loading-spinner';
+import { RoutineActions } from '@/features/routines/components/routine-actions';
 import Link from 'next/link';
-import type { WeeklyWorkout } from '@/components/routines/types';
-import { getExercisesByUser } from '@/lib/db/queries';
+import type { WeeklyWorkout } from '@/features/routines/components/types';
 
 interface RoutineDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
 async function EditRoutineServer({ routineId, userId }: { routineId: string; userId: string }) {
-  const [routine, exercises] = await Promise.all([getRoutineWithWorkouts(routineId), getExercisesByUser(userId)]);
+  const routine = await getRoutineWithWorkouts(routineId);
 
   if (!routine || routine.userId !== userId) {
     notFound();
@@ -50,12 +49,7 @@ async function EditRoutineServer({ routineId, userId }: { routineId: string; use
         </div>
         <RoutineActions routineId={routine.id} routineName={routine.name} />
       </div>
-      <EditRoutine
-        routineName={routine.name}
-        routineId={routine.id}
-        weeklyWorkouts={weeklyWorkouts}
-        exercises={exercises}
-      />
+      <EditRoutine routineName={routine.name} routineId={routine.id} weeklyWorkouts={weeklyWorkouts} />
     </div>
   );
 }

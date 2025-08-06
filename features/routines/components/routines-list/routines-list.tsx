@@ -1,0 +1,25 @@
+import { RoutineCard } from '../routine-card';
+import { EmptyState } from '@/features/shared/components/common/empty-state';
+import { Plus } from 'lucide-react';
+
+import type { RoutinesListProps } from './types';
+
+export function RoutinesList({ routines }: RoutinesListProps) {
+  if (routines.length === 0) {
+    return (
+      <EmptyState
+        icon={<Plus className="w-12 h-12 text-gray-400" />}
+        title="No routines yet"
+        description="Create your first routine to start planning your workouts."
+      />
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {routines.map((routine) => (
+        <RoutineCard key={routine.id} routine={routine} />
+      ))}
+    </div>
+  );
+}

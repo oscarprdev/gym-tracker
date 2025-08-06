@@ -10,7 +10,7 @@ export function withAuth<P extends Record<string, unknown>>(Component: React.Com
     const user = await getUser();
 
     if (!user) {
-      redirect('/auth/login');
+      redirect('/login');
     }
 
     return <Component {...props} />;

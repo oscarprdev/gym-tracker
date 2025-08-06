@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, uuid } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
@@ -8,6 +8,8 @@ export const users = pgTable('users', {
     .$defaultFn(() => false)
     .notNull(),
   image: text('image'),
+  activeRoutineId: uuid('active_routine_id'),
+  routineAssigned: boolean('routine_assigned').default(false).notNull(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),

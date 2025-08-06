@@ -6,11 +6,15 @@ import { workouts, workoutExercises, workoutExerciseSets } from './workouts';
 import { workoutSessions } from './workout-sessions';
 
 // User relations
-export const userRelations = relations(users, ({ many }) => ({
+export const userRelations = relations(users, ({ one, many }) => ({
   routines: many(routines),
   workoutSessions: many(workoutSessions),
   weeklySchedule: many(weeklySchedule),
   customExercises: many(exercises),
+  activeRoutine: one(routines, {
+    fields: [users.activeRoutineId],
+    references: [routines.id],
+  }),
 }));
 
 // Exercise relations
