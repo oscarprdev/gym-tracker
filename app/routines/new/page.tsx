@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { requireAuth } from '@/lib/auth/dal';
-import { UserMenu } from '@/components/auth/user-menu';
-import { CreateRoutine } from '@/components/routines/create-routine';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { CreateRoutine } from '@/features/routines/components/create-routine';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { LoadingSpinner } from '@/features/shared/components/common/loading-spinner';
 
 export const metadata: Metadata = {
   title: 'Create New Routine | Gym Tracker',

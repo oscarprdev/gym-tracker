@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { requireAuth } from '@/lib/auth/dal';
-import { UserMenu } from '@/components/auth/user-menu';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { DashboardRoutines } from '@/components/routines/dashboard-routines';
-import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/components/ui/card';
+import { Button } from '@/features/shared/components/ui/button';
+import { DashboardRoutines } from '@/features/routines/components/dashboard-routines';
+import { LoadingSpinner } from '@/features/shared/components/common/loading-spinner';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 

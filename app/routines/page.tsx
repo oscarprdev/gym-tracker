@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { LoadingSpinner } from '@/features/shared/components/common/loading-spinner';
 import { requireAuth } from '@/lib/auth/dal';
 import { getRoutinesWithStatsByUserId } from '@/lib/db/queries/routines';
-import { RoutinesList } from '@/components/routines/routines-list';
-import { UserMenu } from '@/components/auth/user-menu';
-import { Button } from '@/components/ui/button';
+import { RoutinesList } from '@/features/routines/components/routines-list';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { Button } from '@/features/shared/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { getExercisesByUser } from '@/lib/db/queries';

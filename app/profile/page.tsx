@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { requireAuth } from '@/lib/auth/dal';
-import { UserMenu } from '@/components/auth/user-menu';
-import { ProfileForm } from '@/components/profile/profile-form';
-import { ChangePasswordForm } from '@/components/profile/change-password-form';
-import { DangerZone } from '@/components/profile/danger-zone';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { ProfileForm } from '@/features/profile/components/profile-form';
+import { ChangePasswordForm } from '@/features/profile/components/change-password-form';
+import { DangerZone } from '@/features/profile/components/danger-zone';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/features/shared/components/ui/tabs';
 
 export const metadata: Metadata = {
   title: 'Profile | Gym Tracker',

@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth/utils';
-import { RegisterForm } from '@/components/auth/register-form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RegisterForm } from '@/features/auth/components/register-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/components/ui/card';
 
 export const metadata: Metadata = {
   title: 'Register | Gym Tracker',

@@ -1,14 +1,14 @@
 import { Suspense } from 'react';
-import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { LoadingSpinner } from '@/features/shared/components/common/loading-spinner';
 import { requireAuth } from '@/lib/auth/utils';
-import { getAllExercises, getUserCustomExercises } from '@/lib/db/queries/exercises';
-import { ExercisesClient } from '@/components/exercises/exercises-client';
+import { getExercisesByUserDefault, getExercisesByUser } from '@/lib/db/queries/exercises';
+import { ExercisesClient } from '@/features/exercises/components/exercises-client';
 
 async function ExercisesList() {
   const session = await requireAuth();
   const [allExercises, customExercises] = await Promise.all([
-    getAllExercises(),
-    getUserCustomExercises(session.user.id),
+    getExercisesByUserDefault(session.user.id),
+    getExercisesByUser(session.user.id),
   ]);
 
   return <ExercisesClient allExercises={allExercises} customExercises={customExercises} />;
