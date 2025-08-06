@@ -8,6 +8,7 @@ import {
   updateExercise,
   deleteExercise,
   getExercisesByUserAndMuscleGroups,
+  getExercisesByUserDefault,
 } from '@/lib/db/queries/exercises';
 
 export const createExerciseAction = protectedAction(
@@ -84,6 +85,16 @@ export const deleteExerciseAction = protectedAction(async (session, exerciseId: 
 
 export const getExercisesByMuscleGroupsAction = protectedAction(async (session, muscleGroups: string[]) => {
   const [fetchError, exercises] = await to(getExercisesByUserAndMuscleGroups(session.user.id, muscleGroups));
+
+  if (fetchError) {
+    return { error: fetchError.message || 'Failed to fetch exercises', exercises: [], success: false };
+  }
+
+  return { exercises: exercises || [], error: null, success: true };
+});
+
+export const getDefaultExercisesAction = protectedAction(async (session) => {
+  const [fetchError, exercises] = await to(getExercisesByUserDefault(session.user.id));
 
   if (fetchError) {
     return { error: fetchError.message || 'Failed to fetch exercises', exercises: [], success: false };

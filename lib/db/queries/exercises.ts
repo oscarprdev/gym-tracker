@@ -69,11 +69,22 @@ export const EXERCISES = {
 
     return result;
   },
+
+  GET_BY_USER_DEFAULT: async (userId: string): Promise<Exercise[]> => {
+    const result = await db.query.exercises.findMany({
+      where: eq(exercises.createdBy, userId),
+      orderBy: (exercises, { desc }) => [desc(exercises.createdAt)],
+      limit: 10,
+    });
+
+    return result;
+  },
 };
 
 export const createExercise = EXERCISES.CREATE;
 export const getExerciseById = EXERCISES.GET_BY_ID;
 export const getExercisesByUser = EXERCISES.GET_BY_USER;
 export const getExercisesByUserAndMuscleGroups = EXERCISES.GET_BY_USER_AND_MUSCLE_GROUPS;
+export const getExercisesByUserDefault = EXERCISES.GET_BY_USER_DEFAULT;
 export const updateExercise = EXERCISES.UPDATE;
 export const deleteExercise = EXERCISES.DELETE;

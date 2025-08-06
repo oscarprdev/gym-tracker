@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Search, X, Loader2 } from 'lucide-react';
 import { getMuscleGroupColor, MUSCLE_GROUP_COLORS } from '@/lib/utils/muscle-groups';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { getExercisesByMuscleGroupsAction } from '@/app/exercises/actions';
+import { getExercisesByMuscleGroupsAction, getDefaultExercisesAction } from '@/app/exercises/actions';
 import type { Exercise } from '@/lib/db/schema/exercises';
 
 interface ExerciseSelectionSidebarProps {
@@ -22,18 +22,28 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscleGroups, setSelectedMuscleGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start with loading true for initial load
+  const [isLoadingFiltered, setIsLoadingFiltered] = useState(false); // Separate loading for filtered exercises
   const [error, setError] = useState<string | null>(null);
 
   const availableMuscleGroups = Object.keys(MUSCLE_GROUP_COLORS);
 
+  // Load default exercises on mount
+  useEffect(() => {
+    if (isOpen) {
+      fetchDefaultExercises();
+    }
+  }, [isOpen]);
+
+  // Handle muscle group filter changes
   useEffect(() => {
     if (selectedMuscleGroups.length > 0) {
-      fetchExercises();
-    } else {
-      setExercises([]);
+      fetchFilteredExercises();
+    } else if (isOpen) {
+      // Return to default exercises when filters are cleared
+      fetchDefaultExercises();
     }
-  }, [selectedMuscleGroups]);
+  }, [selectedMuscleGroups, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -41,13 +51,37 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
       setSelectedMuscleGroups([]);
       setExercises([]);
       setError(null);
+      setIsLoading(false);
+      setIsLoadingFiltered(false);
     }
   }, [isOpen]);
 
-  const fetchExercises = useCallback(async () => {
+  // Fetch default exercises (10 most recent)
+  const fetchDefaultExercises = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await getDefaultExercisesAction();
+
+      if ('exercises' in result) {
+        setExercises(result.exercises);
+      } else {
+        setError(result.error || 'Failed to load exercises. Please try again.');
+      }
+    } catch (err) {
+      setError('Failed to load exercises. Please try again.');
+      console.error('Error fetching default exercises:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Fetch filtered exercises by muscle groups
+  const fetchFilteredExercises = useCallback(async () => {
     if (selectedMuscleGroups.length === 0) return;
 
-    setIsLoading(true);
+    setIsLoadingFiltered(true);
     setError(null);
 
     try {
@@ -60,9 +94,9 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
       }
     } catch (err) {
       setError('Failed to load exercises. Please try again.');
-      console.error('Error fetching exercises:', err);
+      console.error('Error fetching filtered exercises:', err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingFiltered(false);
     }
   }, [selectedMuscleGroups]);
 
@@ -128,7 +162,6 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="pl-10 pr-10"
-        disabled={selectedMuscleGroups.length === 0}
       />
       {searchTerm && (
         <button
@@ -142,23 +175,14 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
   );
 
   const renderExerciseList = () => {
-    if (selectedMuscleGroups.length === 0) {
-      return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="text-gray-400 mb-2">
-            <Search className="h-12 w-12 mx-auto" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">Select a muscle group</h3>
-          <p className="text-sm text-gray-500">Choose one or more muscle groups to view exercises</p>
-        </div>
-      );
-    }
-
-    if (isLoading) {
+    // Show loading state for initial load or filtered load
+    if (isLoading || isLoadingFiltered) {
       return (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-          <span className="ml-2 text-sm text-gray-500">Loading exercises...</span>
+          <span className="ml-2 text-sm text-gray-500">
+            {isLoading ? 'Loading exercises...' : 'Filtering exercises...'}
+          </span>
         </div>
       );
     }
@@ -171,7 +195,11 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-1">Error loading exercises</h3>
           <p className="text-sm text-gray-500 mb-4">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchExercises}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={selectedMuscleGroups.length > 0 ? fetchFilteredExercises : fetchDefaultExercises}
+          >
             Try again
           </Button>
         </div>
@@ -186,7 +214,11 @@ export function ExerciseSelectionSidebar({ isOpen, onOpenChange, onExerciseSelec
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-1">No exercises found</h3>
           <p className="text-sm text-gray-500">
-            {searchTerm ? 'Try adjusting your search term or filters' : 'No exercises match the selected muscle groups'}
+            {searchTerm
+              ? 'Try adjusting your search term' + (selectedMuscleGroups.length > 0 ? ' or muscle group filters' : '')
+              : selectedMuscleGroups.length > 0
+                ? 'No exercises match the selected muscle groups'
+                : 'No exercises available'}
           </p>
         </div>
       );
