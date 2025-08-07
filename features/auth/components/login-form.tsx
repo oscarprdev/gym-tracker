@@ -1,40 +1,52 @@
 'use client';
 
-import { useState, useActionState } from 'react';
+import { useState } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { loginAction } from '@/features/auth/services/actions';
 import { Button } from '@/features/shared/components/ui/button';
 import { Input } from '@/features/shared/components/ui/input';
 import { Label } from '@/features/shared/components/ui/label';
+import { useLoginForm } from '@/features/auth/hooks/use-login-form';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, formAction, isPending] = useActionState(loginAction, null);
+  const { form, onSubmit, isPending, serverError } = useLoginForm();
+
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
-    <form action={formAction} className="space-y-4">
-      {state?.error && (
+    <form onSubmit={onSubmit} className="space-y-4">
+      {serverError && (
         <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-          {state.error}
+          {serverError}
         </div>
       )}
 
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" placeholder="Enter your email" disabled={isPending} required />
-        {state?.fieldErrors?.email?.[0] && <p className="text-sm text-destructive">{state.fieldErrors.email[0]}</p>}
+        <Input
+          {...register('email')}
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          disabled={isPending}
+          aria-invalid={!!errors.email}
+        />
+        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <div className="relative">
           <Input
+            {...register('password')}
             id="password"
-            name="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
             disabled={isPending}
-            required
+            aria-invalid={!!errors.password}
           />
           <Button
             type="button"
@@ -48,9 +60,7 @@ export function LoginForm() {
             <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
           </Button>
         </div>
-        {state?.fieldErrors?.password?.[0] && (
-          <p className="text-sm text-destructive">{state.fieldErrors.password[0]}</p>
-        )}
+        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isPending}>
