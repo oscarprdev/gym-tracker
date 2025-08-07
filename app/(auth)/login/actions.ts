@@ -1,45 +1,24 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { parseLogin, parseRegister } from '@/features/auth/validations';
-import { to, toSync, handleValidationError } from '@/lib/utils/error-handler';
-import type { LoginState, RegisterState } from '@/features/auth/types';
+import { LoginFormValues, parseLogin } from '@/features/auth/validations';
+import { to, toSync } from '@/features/shared/utils/error-handler';
 import signInEmail from '@/features/auth/services/sign-in-email';
-import signUpEmail from '@/features/auth/services/sign-up-email';
+import { Nullable } from '@/features/shared';
 
-export async function loginAction(formData: FormData): Promise<LoginState> {
-  const [validationError, validatedData] = toSync(() => parseLogin(formData));
-
-  const validationErrorResult = handleValidationError(validationError, validatedData);
-  if (validationErrorResult || !validatedData) {
-    return { error: validationErrorResult?.error || 'Invalid Data' };
-  }
-
-  const [authError, result] = await to(signInEmail({ email: validatedData.email, password: validatedData.password }));
-  if (authError || !result?.user) {
-    return {
-      error: authError?.message || 'Invalid email or password',
-    };
-  }
-
-  redirect('/');
+export interface LoginActionOutput {
+  error: Nullable<string>;
 }
 
-export async function registerAction(formData: FormData): Promise<RegisterState> {
-  const [validationError, validatedData] = toSync(() => parseRegister(formData));
+export async function loginAction(input: LoginFormValues): Promise<LoginActionOutput> {
+  const [validationError, validatedData] = toSync(() => parseLogin(input));
 
-  const validationErrorResult = handleValidationError(validationError, validatedData);
-  if (validationErrorResult || !validatedData) {
-    return { error: validationErrorResult?.error || 'Invalid form data' };
-  }
-
-  if (validatedData.confirmPassword !== validatedData.password) {
-    return { error: 'Password does not match with Confirmation Password' };
+  if (validationError || !validatedData) {
+    return { error: validationError?.message || 'Invalid Data' };
   }
 
   const [authError, result] = await to(
-    signUpEmail({
-      name: validatedData.name,
+    signInEmail({
       email: validatedData.email,
       password: validatedData.password,
     })
@@ -47,9 +26,9 @@ export async function registerAction(formData: FormData): Promise<RegisterState>
 
   if (authError || !result?.user) {
     return {
-      error: authError?.message || 'Failed to create account',
+      error: authError?.message || 'Invalid email or password',
     };
   }
 
-  redirect('/login');
+  redirect('/');
 }

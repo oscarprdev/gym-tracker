@@ -9,7 +9,7 @@ import { useLoginForm } from '@/features/auth/hooks/use-login-form';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const { form, onSubmit, isPending, serverError } = useLoginForm();
+  const { form, onSubmit, isPending } = useLoginForm();
 
   const {
     register,
@@ -18,12 +18,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {serverError && (
-        <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-          {serverError}
-        </div>
-      )}
-
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

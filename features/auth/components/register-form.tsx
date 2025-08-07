@@ -10,7 +10,7 @@ import { useRegisterForm } from '@/features/auth/hooks/use-register-form';
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { form, onSubmit, isPending, serverError } = useRegisterForm();
+  const { form, onSubmit, isPending } = useRegisterForm();
 
   const {
     register,
@@ -19,12 +19,6 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {serverError && (
-        <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-          {serverError}
-        </div>
-      )}
-
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <Input

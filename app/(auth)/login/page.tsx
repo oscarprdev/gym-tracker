@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getSession } from '@/lib/auth/utils';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/components/ui/card';
+import { verifySession } from '@/lib/auth/utils';
 
 export const metadata: Metadata = {
   title: 'Login | Gym Tracker',
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage() {
-  const session = await getSession();
-  if (session) redirect('/dashboard');
+  const session = await verifySession();
+  if (session) redirect('/');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

@@ -1,53 +1,35 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { loginSchema, type LoginInput } from '@/features/auth/validations';
+import { loginSchema, type LoginFormValues } from '@/features/auth/validations';
 import { loginAction } from '@/app/(auth)/login/actions';
+
+const defaultFormState = {
+  email: '',
+  password: '',
+};
 
 export function useLoginForm() {
   const [isPending, startTransition] = useTransition();
-  const [serverError, setServerError] = useState<string | null>(null);
 
-  const form = useForm<LoginInput>({
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: defaultFormState,
     mode: 'onChange',
   });
 
-  const onSubmit = (data: LoginInput) => {
-    setServerError(null);
-
+  const onSubmit = (data: LoginFormValues) => {
     startTransition(async () => {
       try {
-        const formData = new FormData();
-        formData.append('email', data.email);
-        formData.append('password', data.password);
-
-        const result = await loginAction(formData);
+        const result = await loginAction(data);
 
         if (result?.error) {
-          setServerError(result.error);
           toast.error(result.error);
         }
-
-        if (result?.fieldErrors) {
-          Object.entries(result.fieldErrors).forEach(([field, errors]) => {
-            if (errors?.[0]) {
-              form.setError(field as keyof LoginInput, {
-                message: errors[0],
-              });
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        setServerError('An unexpected error occurred');
+      } catch {
         toast.error('An unexpected error occurred');
       }
     });
@@ -57,6 +39,5 @@ export function useLoginForm() {
     form,
     onSubmit: form.handleSubmit(onSubmit),
     isPending,
-    serverError,
   };
 }
