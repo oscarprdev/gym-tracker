@@ -11,9 +11,3 @@ export interface AuthStateWithMessage extends AuthState {
 export type LoginState = AuthState;
 
 export type RegisterState = AuthState;
-
-export type UpdateProfileState = AuthStateWithMessage;
-
-export type ChangePasswordState = AuthStateWithMessage;
-
-export type DeleteAccountState = AuthStateWithMessage;

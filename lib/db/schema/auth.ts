@@ -9,7 +9,6 @@ export const users = pgTable('users', {
     .notNull(),
   image: text('image'),
   activeRoutineId: uuid('active_routine_id'),
-  routineAssigned: boolean('routine_assigned').default(false).notNull(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
