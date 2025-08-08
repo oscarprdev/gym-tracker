@@ -16,7 +16,7 @@ interface RoutineCardProps {
   routine: RoutineRecord;
 }
 
-export function RoutineCard({ routine }: RoutineCardProps) {
+export function RoutinesCard({ routine }: RoutineCardProps) {
   const deleteRoutineMutation = useDeleteRoutine();
 
   const handleDeleteRoutine = async () => {
