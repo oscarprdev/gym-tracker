@@ -9,12 +9,14 @@ import { useLoginForm } from '@/features/auth/hooks/use-login-form';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const { form, onSubmit, isPending } = useLoginForm();
-
   const {
-    register,
-    formState: { errors },
-  } = form;
+    form: {
+      register,
+      formState: { errors },
+    },
+    onSubmit,
+    isPending,
+  } = useLoginForm();
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">

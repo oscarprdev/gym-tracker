@@ -10,12 +10,14 @@ import { useRegisterForm } from '@/features/auth/hooks/use-register-form';
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { form, onSubmit, isPending } = useRegisterForm();
-
   const {
-    register,
-    formState: { errors },
-  } = form;
+    form: {
+      register,
+      formState: { errors },
+    },
+    onSubmit,
+    isPending,
+  } = useRegisterForm();
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">

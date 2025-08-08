@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { loginSchema, type LoginFormValues } from '@/features/auth/validations';
 import { loginAction } from '@/app/(auth)/login/actions';
 
-const defaultFormState = {
+const defaultFormState: LoginFormValues = {
   email: '',
   password: '',
 };
