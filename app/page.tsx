@@ -1,7 +1,7 @@
 import { requireAuth } from '@/lib/auth/utils';
-import { RoutinesDashboard } from '@/features/routines';
 import { getUserRoutines } from '@/lib/db/queries/routines';
 import { SidebarProvider } from '@/features/shared/providers/sidebar-provider';
+import { RoutinesList } from '@/features/routines';
 
 export default async function Home() {
   const session = await requireAuth();
@@ -10,7 +10,7 @@ export default async function Home() {
   return (
     <main>
       <SidebarProvider routines={routines}>
-        <RoutinesDashboard routines={routines} />
+        <RoutinesList />
       </SidebarProvider>
     </main>
   );

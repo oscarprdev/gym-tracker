@@ -1,4 +1,3 @@
-export { RoutinesDashboard } from './components/routines-dashboard';
 export { CreateRoutineForm } from './components/create-routine-form';
 export { RoutinesList } from './components/routines-list';
 export { RoutinesSidebar } from './components/routines-sidebar';

@@ -1,17 +1,12 @@
 'use client';
 
-import type { RoutineRecord } from '@/lib/db/queries/routines/get-user-routines';
 import { Plus } from 'lucide-react';
 import { Button } from '@/features/shared/components/ui/button';
 import { useSidebar } from '@/features/shared/providers/sidebar-provider';
 import { SidebarKinds } from '@/features/shared';
 
-interface RoutinesListProps {
-  routines: RoutineRecord[];
-}
-
-export function RoutinesList({ routines }: RoutinesListProps) {
-  const { toggleRoutineSidebar } = useSidebar();
+export function RoutinesList() {
+  const { toggleRoutineSidebar, routines } = useSidebar();
 
   const onCreateRoutine = () => {
     toggleRoutineSidebar({ isOpen: true, kind: SidebarKinds.create });
@@ -24,10 +19,9 @@ export function RoutinesList({ routines }: RoutinesListProps) {
 
   return (
     <div className="flex-1 bg-white overflow-y-auto">
-      {/* Mobile Header */}
-      <div className="md:hidden border-b border-gray-200 p-4">
+      <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-black">Your routines</h1>
+          <h1 className="text-xl font-semibold text-black">My routines</h1>
           <Button onClick={onCreateRoutine}>
             <Plus className="w-4 h-4" />
             Create routine

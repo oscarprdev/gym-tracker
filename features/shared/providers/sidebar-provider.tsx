@@ -1,3 +1,5 @@
+'use client';
+
 import { RoutinesSidebar } from '@/features/routines';
 import { RoutineRecord } from '@/lib/db/queries';
 import { createContext, PropsWithChildren, useContext, useState } from 'react';
@@ -60,27 +62,11 @@ export const SidebarProvider = ({ children, routines, selectedRoutineId }: Props
         routines,
         selectedRoutineId,
         toggleRoutineSidebar: toggleRoutinesSidebar,
-        // toggleExerciseSidebar,
-        // toggleWorkoutSidebar,
       }}
     >
       <RoutinesSidebar isOpen={routinesSidebarState.isOpen}>
-        <RoutinesSidebar.Header />
         {routinesSidebarState.kind === SidebarKinds.create && <RoutinesSidebar.Create />}
-        {/* {
-            routineSidebarState.kind === SidebarKinds.edit && <RoutinesSidebar.Edit />
-        } */}
       </RoutinesSidebar>
-      {/* <WorkoutsSidebar isOpen={workoutsSidebarState.isOpen} onWorkoutSelect={() => {}}>
-        <WorkoutsSidebar.Header />
-        {workoutsSidebarState.kind === SidebarKinds.create && <WorkoutsSidebar.Create />}
-        {workoutsSidebarState.kind === SidebarKinds.edit && <WorkoutsSidebar.Edit />}
-      </ExercisesSidebar>
-      <ExercisesSidebar isOpen={exercisesSidebarState.isOpen} onExerciseSelect={() => {}}>
-        <ExercisesSidebar.Header />
-        {exercisesSidebarState.kind === SidebarKinds.create && <ExercisesSidebar.Create />}
-        {exercisesSidebarState.kind === SidebarKinds.edit && <ExercisesSidebar.Edit />}
-      </WorkoutsSidebar> */}
       {children}
     </SidebarContext.Provider>
   );

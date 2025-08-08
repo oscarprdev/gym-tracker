@@ -1,9 +1,7 @@
 'use client';
 
 import { createContext, PropsWithChildren, useContext } from 'react';
-import { Plus } from 'lucide-react';
-import { Button } from '@/features/shared/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/features/shared/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/features/shared/components/ui/sheet';
 import { CreateRoutineForm } from './create-routine-form';
 import { CreateRoutineFormValues } from '../validations';
 import { createRoutineAction } from '../actions/create-routine';
@@ -27,19 +25,7 @@ const useRoutinesSidebar = () => {
 };
 
 export function RoutinesSidebar({ children, isOpen }: PropsWithChildren<RoutinesSidebarContextType>) {
-  return (
-    <RoutinesSidebarContext.Provider value={{ isOpen }}>
-      <div className="w-80 bg-gray-50 border-r border-black min-h-screen flex flex-col md:flex">{children}</div>
-    </RoutinesSidebarContext.Provider>
-  );
-}
-
-function RoutinesSidebarHeader() {
-  return (
-    <div className="p-6 border-b border-gray-200">
-      <h2 className="text-xl font-semibold text-black mb-4">My Routines</h2>
-    </div>
-  );
+  return <RoutinesSidebarContext.Provider value={{ isOpen }}>{children}</RoutinesSidebarContext.Provider>;
 }
 
 function RoutinesSidebarWorkoutsList({ workouts }: { workouts: WorkoutToAdd[] }) {
@@ -76,12 +62,6 @@ function RoutinesSidebarCreate() {
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>
-        <Button className="w-full bg-black text-white hover:bg-gray-800 border border-black">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Routine
-        </Button>
-      </SheetTrigger>
       <SheetContent className="routines-light-theme bg-white border-l border-black">
         <SheetHeader>
           <SheetTitle className="text-black">Create New Routine</SheetTitle>
@@ -94,4 +74,3 @@ function RoutinesSidebarCreate() {
 }
 
 RoutinesSidebar.Create = RoutinesSidebarCreate;
-RoutinesSidebar.Header = RoutinesSidebarHeader;
