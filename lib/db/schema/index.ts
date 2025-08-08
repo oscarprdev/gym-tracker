@@ -3,7 +3,5 @@ export * from './exercises';
 export * from './routines';
 export * from './workouts';
 export * from './workout-exercises';
-export * from './workout-exercise-sets';
 export * from './workout-sessions';
-export * from './weekly-schedule';
 export * from './relations';

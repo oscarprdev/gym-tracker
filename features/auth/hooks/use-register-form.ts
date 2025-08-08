@@ -1,11 +1,9 @@
 'use client';
 
-import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { RegisterFormValues, registerSchema } from '@/features/auth/validations';
-import { registerAction } from '@/app/(auth)/register/actions';
+import { useRegister } from './use-auth-mutations';
 import { to } from '@/features/shared/utils';
 
 const defaultFormState: RegisterFormValues = {
@@ -15,8 +13,12 @@ const defaultFormState: RegisterFormValues = {
   confirmPassword: '',
 };
 
-export function useRegisterForm() {
-  const [isPending, startTransition] = useTransition();
+interface UseRegisterFormProps {
+  onSuccess?: () => void;
+}
+
+export function useRegisterForm({ onSuccess }: UseRegisterFormProps = {}) {
+  const registerMutation = useRegister();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -24,19 +26,18 @@ export function useRegisterForm() {
     mode: 'onChange',
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    startTransition(async () => {
-      const [error, result] = await to(registerAction(data));
-
-      if (error || result?.error) {
-        toast.error(error?.message || result?.error || 'An unexpected error occurred');
-      }
-    });
+  const onSubmit = async (data: RegisterFormValues) => {
+    const [error] = await to(registerMutation.mutateAsync(data));
+    if (error) {
+      throw new Error(error.message);
+    }
+    form.reset();
+    onSuccess?.();
   };
 
   return {
     form,
     onSubmit: form.handleSubmit(onSubmit),
-    isPending,
+    isPending: registerMutation.isPending,
   };
 }

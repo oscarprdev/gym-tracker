@@ -1,19 +1,22 @@
 'use client';
 
-import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { loginSchema, type LoginFormValues } from '@/features/auth/validations';
-import { loginAction } from '@/app/(auth)/login/actions';
+import { useLogin } from './use-auth-mutations';
+import { to } from '@/features/shared/utils';
 
 const defaultFormState: LoginFormValues = {
   email: '',
   password: '',
 };
 
-export function useLoginForm() {
-  const [isPending, startTransition] = useTransition();
+interface UseLoginFormProps {
+  onSuccess?: () => void;
+}
+
+export function useLoginForm({ onSuccess }: UseLoginFormProps = {}) {
+  const loginMutation = useLogin();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -21,23 +24,18 @@ export function useLoginForm() {
     mode: 'onChange',
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    startTransition(async () => {
-      try {
-        const result = await loginAction(data);
-
-        if (result?.error) {
-          toast.error(result.error);
-        }
-      } catch {
-        toast.error('An unexpected error occurred');
-      }
-    });
+  const onSubmit = async (data: LoginFormValues) => {
+    const [error] = await to(loginMutation.mutateAsync(data));
+    if (error) {
+      throw new Error(error.message);
+    }
+    form.reset();
+    onSuccess?.();
   };
 
   return {
     form,
     onSubmit: form.handleSubmit(onSubmit),
-    isPending,
+    isPending: loginMutation.isPending,
   };
 }

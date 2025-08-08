@@ -7,7 +7,7 @@ interface SignInEmailInput {
 }
 
 export default async function signInEmail({ email, password }: SignInEmailInput) {
-  return auth.api.signInEmail({
+  return await auth.api.signInEmail({
     body: {
       email,
       password,
