@@ -1,5 +1,7 @@
 import { requireAuth } from '@/lib/auth/utils';
 
+export { requireAuth };
+
 export async function to<T, E = Error>(promise: Promise<T>): Promise<[E | null, T | null]> {
   try {
     const data = await promise;
