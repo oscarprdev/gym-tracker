@@ -10,6 +10,7 @@ export async function getRoutineWorkouts(routineId: string) {
       name: workouts.name,
       dayOfWeek: workouts.dayOfWeek,
       order: workouts.order,
+      muscleGroups: workouts.muscleGroups,
       createdAt: workouts.createdAt,
       updatedAt: workouts.updatedAt,
     })

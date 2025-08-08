@@ -7,13 +7,16 @@ import { Input } from '@/features/shared/components/ui/input';
 import { Label } from '@/features/shared/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/features/shared/components/ui/form';
 import { useCreateRoutineForm } from '../hooks/use-create-routine-form';
+import { CreateRoutineFormValues } from '../validations';
+import { ActionResponse } from '@/features/shared/types';
 
 interface CreateRoutineFormProps {
-  onSuccess?: () => void;
+  onSubmitFormAction: (data: CreateRoutineFormValues) => Promise<ActionResponse | void>;
+  onOpenChange: (isOpen: boolean) => void;
 }
 
-export function CreateRoutineForm({ onSuccess }: CreateRoutineFormProps) {
-  const { form, onSubmit, isPending } = useCreateRoutineForm({ onSuccess });
+export function CreateRoutineForm({ onSubmitFormAction, onOpenChange }: CreateRoutineFormProps) {
+  const { form, onSubmit, isPending } = useCreateRoutineForm({ onSubmitFormAction });
 
   return (
     <div className="routines-light-theme bg-white">
@@ -64,8 +67,8 @@ export function CreateRoutineForm({ onSuccess }: CreateRoutineFormProps) {
               type="button"
               variant="outline"
               className="w-full border-black text-black hover:bg-gray-100"
-              onClick={() => onSuccess?.()}
               disabled={isPending}
+              onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>

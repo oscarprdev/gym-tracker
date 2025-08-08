@@ -1,0 +1,1 @@
+ALTER TABLE "workouts" ADD COLUMN "muscle_groups" text[] NOT NULL;

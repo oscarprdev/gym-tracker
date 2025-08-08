@@ -15,6 +15,20 @@
       "when": 1754593564952,
       "tag": "0001_new_roxanne_simpson",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754668990442,
+      "tag": "0002_boring_thena",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1754686072924,
+      "tag": "0003_late_invisible_woman",
+      "breakpoints": true
     }
   ]
 }

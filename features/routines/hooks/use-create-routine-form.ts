@@ -4,17 +4,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createRoutineSchema, type CreateRoutineFormValues } from '../validations';
 import { useCreateRoutine } from './use-routines';
+import { ActionResponse } from '@/features/shared/types';
+
+interface UseCreateRoutineFormProps {
+  onSubmitFormAction: (data: CreateRoutineFormValues) => Promise<ActionResponse | void>;
+}
 
 const defaultFormState: CreateRoutineFormValues = {
   name: '',
+  workoutIds: [],
 };
 
-interface UseCreateRoutineFormProps {
-  onSuccess?: () => void;
-}
-
-export function useCreateRoutineForm({ onSuccess }: UseCreateRoutineFormProps = {}) {
-  const createRoutineMutation = useCreateRoutine();
+export function useCreateRoutineForm({ onSubmitFormAction }: UseCreateRoutineFormProps) {
+  const createRoutineMutation = useCreateRoutine(onSubmitFormAction);
 
   const form = useForm<CreateRoutineFormValues>({
     resolver: zodResolver(createRoutineSchema),
@@ -25,7 +27,6 @@ export function useCreateRoutineForm({ onSuccess }: UseCreateRoutineFormProps = 
   const onSubmit = async (data: CreateRoutineFormValues) => {
     await createRoutineMutation.mutateAsync(data);
     form.reset();
-    onSuccess?.();
   };
 
   return {

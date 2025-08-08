@@ -2,18 +2,16 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { createRoutineServerAction, deleteRoutineServerAction } from '@/app/routines/actions';
+import { deleteRoutineServerAction } from '@/app/routines/actions';
 import type { CreateRoutineFormValues } from '../validations';
 import { to } from '@/features/shared/utils';
+import { ActionResponse } from '@/features/shared/types';
 
-export function useCreateRoutine() {
+export function useCreateRoutine(
+  onSubmitFormAction: (data: CreateRoutineFormValues) => Promise<ActionResponse | void>
+) {
   return useMutation({
-    mutationFn: async (data: CreateRoutineFormValues) => {
-      const [error] = await to(createRoutineServerAction(data));
-      if (error) {
-        throw new Error(error.message);
-      }
-    },
+    mutationFn: onSubmitFormAction,
     onSuccess: () => {
       toast.success('Routine created successfully');
     },

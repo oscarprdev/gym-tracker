@@ -8,6 +8,7 @@ export const exerciseIdSchema = z.string().min(1, 'Exercise ID is required');
 // Routine schemas
 export const createRoutineSchema = z.object({
   name: z.string().min(1, 'Routine name is required').max(100, 'Name must be less than 100 characters'),
+  workoutIds: z.array(workoutIdSchema),
 });
 
 export const updateRoutineSchema = z.object({
