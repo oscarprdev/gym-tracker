@@ -31,7 +31,7 @@ export async function getUserWorkouts(userId: string): Promise<UserWorkoutRecord
   );
 
   if (error) {
-    throw new Error('Failed to fetch user workouts');
+    throw new Error('Failed to fetch workouts for user');
   }
 
   return result || [];

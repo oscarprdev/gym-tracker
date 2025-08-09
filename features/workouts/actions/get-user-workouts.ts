@@ -8,7 +8,7 @@ export const getUserWorkoutsAction = protectedAction(async (session) => {
   const [error, result] = await to(getUserWorkouts(session.userId));
 
   if (error) {
-    return { error: 'Failed to fetch user workouts', workouts: [] };
+    return { error: error.message, workouts: [] };
   }
 
   return { error: null, workouts: result };
