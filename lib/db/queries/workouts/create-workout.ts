@@ -1,42 +1,34 @@
 import { db } from '@/lib/db/client';
 import { workouts } from '@/lib/db/schema';
-import { sql } from 'drizzle-orm';
 
 export interface CreateWorkoutData {
-  routineId: string;
+  userId: string;
   name: string;
   dayOfWeek?: number | null;
+  muscleGroups: string[];
 }
 
 export async function createWorkout(data: CreateWorkoutData) {
   const workoutId = crypto.randomUUID();
   const now = new Date();
 
-  // Get the next order value for this routine
-  const maxOrderResult = await db
-    .select({ maxOrder: sql<number>`COALESCE(MAX(${workouts.order}), 0)` })
-    .from(workouts)
-    .where(sql`${workouts.routineId} = ${data.routineId}`);
-
-  const nextOrder = (maxOrderResult[0]?.maxOrder || 0) + 1;
-
   const result = await db
     .insert(workouts)
     .values({
       id: workoutId,
-      routineId: data.routineId,
+      userId: data.userId,
       name: data.name,
       dayOfWeek: data.dayOfWeek || null,
-      order: nextOrder,
+      muscleGroups: data.muscleGroups,
       createdAt: now,
       updatedAt: now,
     })
     .returning({
       id: workouts.id,
-      routineId: workouts.routineId,
+      userId: workouts.userId,
       name: workouts.name,
       dayOfWeek: workouts.dayOfWeek,
-      order: workouts.order,
+      muscleGroups: workouts.muscleGroups,
       createdAt: workouts.createdAt,
       updatedAt: workouts.updatedAt,
     });

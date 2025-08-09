@@ -1,6 +1,7 @@
 'use client';
 
 import { RoutinesSidebar } from '@/features/routines';
+import { WorkoutsSidebar } from '@/features/workouts/components/workouts-sidebar';
 import { RoutineRecord } from '@/lib/db/queries';
 import { createContext, PropsWithChildren, useContext, useState } from 'react';
 import { SidebarKinds, SidebarState } from '../types';
@@ -18,17 +19,17 @@ const defaultSidebarState: SidebarState = {
 interface SidebarContextType {
   routines: RoutineRecord[];
   selectedRoutineId?: string;
-  toggleRoutineSidebar: (input: SidebarState) => void;
+  toggleRoutinesSidebar: (input: SidebarState) => void;
+  toggleWorkoutsSidebar: (input: SidebarState) => void;
   // toggleExerciseSidebar: (input: SidebarState) => void;
-  // toggleWorkoutSidebar: (input: SidebarState) => void;
 }
 
 export const SidebarContext = createContext<SidebarContextType>({
   routines: [],
   selectedRoutineId: undefined,
-  toggleRoutineSidebar: () => {},
+  toggleRoutinesSidebar: () => {},
+  toggleWorkoutsSidebar: () => {},
   // toggleExerciseSidebar: () => {},
-  // toggleWorkoutSidebar: () => {},
 });
 
 export const useSidebar = () => {
@@ -41,19 +42,20 @@ export const useSidebar = () => {
 
 export const SidebarProvider = ({ children, routines, selectedRoutineId }: PropsWithChildren<SidebarContextProps>) => {
   const [routinesSidebarState, setRoutinesSidebarState] = useState<SidebarState>(defaultSidebarState);
+  const [workoutSidebarState, setWorkoutSidebarState] = useState<SidebarState>(defaultSidebarState);
+
   //   const [exerciseSidebarState, setExerciseSidebarState] = useState<SidebarState>(defaultSidebarState);
-  //   const [workoutSidebarState, setWorkoutSidebarState] = useState<SidebarState>(defaultSidebarState);
 
   const toggleRoutinesSidebar = (input: SidebarState) => {
     setRoutinesSidebarState(input);
   };
 
+  const toggleWorkoutsSidebar = (input: SidebarState) => {
+    setWorkoutSidebarState(input);
+  };
+
   //   const toggleExerciseSidebar = (input: SidebarState) => {
   //     setExerciseSidebarState(input);
-  //   };
-
-  //   const toggleWorkoutSidebar = (input: SidebarState) => {
-  //     setWorkoutSidebarState(input);
   //   };
 
   return (
@@ -61,12 +63,17 @@ export const SidebarProvider = ({ children, routines, selectedRoutineId }: Props
       value={{
         routines,
         selectedRoutineId,
-        toggleRoutineSidebar: toggleRoutinesSidebar,
+        toggleRoutinesSidebar,
+        toggleWorkoutsSidebar,
       }}
     >
       <RoutinesSidebar isOpen={routinesSidebarState.isOpen}>
         {routinesSidebarState.kind === SidebarKinds.create && <RoutinesSidebar.Create />}
       </RoutinesSidebar>
+      <WorkoutsSidebar isOpen={workoutSidebarState.isOpen}>
+        {workoutSidebarState.kind === SidebarKinds.select && <WorkoutsSidebar.Select />}
+        {workoutSidebarState.kind === SidebarKinds.create && <WorkoutsSidebar.Create />}
+      </WorkoutsSidebar>
       {children}
     </SidebarContext.Provider>
   );

@@ -1,24 +1,39 @@
 import { db } from '@/lib/db/client';
-import { workouts } from '@/lib/db/schema';
+import { workouts, routinesWorkouts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { to } from '@/features/shared/utils/error-handler';
 
-export async function getRoutineWorkouts(routineId: string) {
-  const result = await db
-    .select({
-      id: workouts.id,
-      routineId: workouts.routineId,
-      name: workouts.name,
-      dayOfWeek: workouts.dayOfWeek,
-      order: workouts.order,
-      muscleGroups: workouts.muscleGroups,
-      createdAt: workouts.createdAt,
-      updatedAt: workouts.updatedAt,
-    })
-    .from(workouts)
-    .where(eq(workouts.routineId, routineId))
-    .orderBy(workouts.order);
-
-  return result;
+export interface WorkoutRecord {
+  id: string;
+  userId: string;
+  name: string;
+  muscleGroups: string[];
+  dayOfWeek: number | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type WorkoutRecord = Awaited<ReturnType<typeof getRoutineWorkouts>>[0];
+export async function getRoutineWorkouts(routineId: string): Promise<WorkoutRecord[]> {
+  const [error, result] = await to(
+    db
+      .select({
+        id: workouts.id,
+        userId: workouts.userId,
+        name: workouts.name,
+        muscleGroups: workouts.muscleGroups,
+        dayOfWeek: workouts.dayOfWeek,
+        createdAt: workouts.createdAt,
+        updatedAt: workouts.updatedAt,
+      })
+      .from(workouts)
+      .innerJoin(routinesWorkouts, eq(workouts.id, routinesWorkouts.workoutId))
+      .where(eq(routinesWorkouts.routineId, routineId))
+      .orderBy(workouts.name)
+  );
+
+  if (error) {
+    throw new Error('Failed to fetch routine workouts');
+  }
+
+  return result || [];
+}

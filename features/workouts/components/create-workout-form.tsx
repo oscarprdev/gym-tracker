@@ -7,14 +7,16 @@ import { Input } from '@/features/shared/components/ui/input';
 import { Label } from '@/features/shared/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/features/shared/components/ui/form';
 import { useCreateWorkoutForm } from '../hooks/use-create-workout-form';
+import { CreateWorkoutData } from '../validations';
+import { ActionResponse } from '@/features/shared/types';
 
 interface CreateWorkoutFormProps {
-  routineId: string;
-  onSuccess?: () => void;
+  onSubmitFormAction: (data: CreateWorkoutData) => Promise<ActionResponse | void>;
+  onOpenChange: (isOpen: boolean) => void;
 }
 
-export function CreateWorkoutForm({ routineId, onSuccess }: CreateWorkoutFormProps) {
-  const { form, onSubmit, isPending } = useCreateWorkoutForm({ routineId, onSuccess });
+export function CreateWorkoutForm({ onSubmitFormAction, onOpenChange }: CreateWorkoutFormProps) {
+  const { form, onSubmit, isPending } = useCreateWorkoutForm({ onSubmitFormAction });
 
   return (
     <div className="routines-light-theme bg-white">
@@ -65,7 +67,7 @@ export function CreateWorkoutForm({ routineId, onSuccess }: CreateWorkoutFormPro
               type="button"
               variant="outline"
               className="w-full border-black text-black hover:bg-gray-100"
-              onClick={() => onSuccess?.()}
+              onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
               Cancel

@@ -6,10 +6,10 @@ import { useSidebar } from '@/features/shared/providers/sidebar-provider';
 import { SidebarKinds } from '@/features/shared';
 
 export function RoutinesList() {
-  const { toggleRoutineSidebar, routines } = useSidebar();
+  const { toggleRoutinesSidebar, routines } = useSidebar();
 
   const onCreateRoutine = () => {
-    toggleRoutineSidebar({ isOpen: true, kind: SidebarKinds.create });
+    toggleRoutinesSidebar({ isOpen: true, kind: SidebarKinds.create });
   };
 
   const onRoutineSelect = async (routineId: string) => {

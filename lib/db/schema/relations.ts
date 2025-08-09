@@ -3,6 +3,7 @@ import { users, sessions, accounts } from './auth';
 import { exercises } from './exercises';
 import { routines } from './routines';
 import { workouts } from './workouts';
+import { routinesWorkouts } from './routines-workouts';
 import { workoutExercises } from './workout-exercises';
 import { workoutSessions } from './workout-sessions';
 
@@ -12,6 +13,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   accounts: many(accounts),
   // Gym tracker relations
   routines: many(routines),
+  workouts: many(workouts),
   createdExercises: many(exercises),
   workoutSessions: many(workoutSessions),
   // Active routine relation
@@ -50,17 +52,18 @@ export const routinesRelations = relations(routines, ({ one, many }) => ({
     fields: [routines.userId],
     references: [users.id],
   }),
-  workouts: many(workouts),
+  routinesWorkouts: many(routinesWorkouts),
   // Users who have this routine as active
   activeForUsers: many(users),
 }));
 
 // Workout relations
 export const workoutsRelations = relations(workouts, ({ one, many }) => ({
-  routine: one(routines, {
-    fields: [workouts.routineId],
-    references: [routines.id],
+  user: one(users, {
+    fields: [workouts.userId],
+    references: [users.id],
   }),
+  routinesWorkouts: many(routinesWorkouts),
   workoutExercises: many(workoutExercises),
   workoutSessions: many(workoutSessions),
 }));
@@ -85,6 +88,18 @@ export const workoutSessionsRelations = relations(workoutSessions, ({ one }) => 
   }),
   workout: one(workouts, {
     fields: [workoutSessions.workoutId],
+    references: [workouts.id],
+  }),
+}));
+
+// Routines-workouts junction table relations
+export const routinesWorkoutsRelations = relations(routinesWorkouts, ({ one }) => ({
+  routine: one(routines, {
+    fields: [routinesWorkouts.routineId],
+    references: [routines.id],
+  }),
+  workout: one(workouts, {
+    fields: [routinesWorkouts.workoutId],
     references: [workouts.id],
   }),
 }));

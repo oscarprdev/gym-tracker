@@ -1,21 +1,25 @@
 'use client';
 
-import React from 'react';
-import { Plus } from 'lucide-react';
+import React, { PropsWithChildren } from 'react';
 import { Button } from '@/features/shared/components/ui/button';
 import { Input } from '@/features/shared/components/ui/input';
-import { Label } from '@/features/shared/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/features/shared/components/ui/form';
 import { useCreateRoutineForm } from '../hooks/use-create-routine-form';
 import { CreateRoutineFormValues } from '../validations';
 import { ActionResponse } from '@/features/shared/types';
+import { useSidebar } from '@/features/shared/providers/sidebar-provider';
 
 interface CreateRoutineFormProps {
   onSubmitFormAction: (data: CreateRoutineFormValues) => Promise<ActionResponse | void>;
   onOpenChange: (isOpen: boolean) => void;
 }
 
-export function CreateRoutineForm({ onSubmitFormAction, onOpenChange }: CreateRoutineFormProps) {
+export function CreateRoutineForm({
+  onSubmitFormAction,
+  onOpenChange,
+  children,
+}: PropsWithChildren<CreateRoutineFormProps>) {
+  const {} = useSidebar();
   const { form, onSubmit, isPending } = useCreateRoutineForm({ onSubmitFormAction });
 
   return (
@@ -41,18 +45,7 @@ export function CreateRoutineForm({ onSubmitFormAction, onOpenChange }: CreateRo
             )}
           />
 
-          <div className="space-y-4">
-            <Label className="text-black font-medium">Workouts</Label>
-            <div className="border border-gray-300 rounded-md p-4 bg-gray-50">
-              <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">Add workouts to your routine after creating it</p>
-                <Button type="button" variant="outline" className="border-black text-black hover:bg-gray-100" disabled>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Workouts
-                </Button>
-              </div>
-            </div>
-          </div>
+          {children}
 
           <div className="flex flex-col gap-3 pt-4">
             <Button

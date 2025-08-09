@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createRoutineSchema, type CreateRoutineFormValues } from '../validations';
-import { useCreateRoutine } from './use-routines';
+import { useCreateRoutine } from './use-create-routine';
 import { ActionResponse } from '@/features/shared/types';
 
 interface UseCreateRoutineFormProps {

@@ -9,6 +9,9 @@ import { to } from '@/features/shared/utils';
 import { useSidebar } from '@/features/shared/providers/sidebar-provider';
 import { SidebarKinds } from '@/features/shared';
 import useRoutinesStore, { WorkoutToAdd } from '@/lib/store/routines-store';
+import { Label } from '@/features/shared/components/ui/label';
+import { Button } from '@/features/shared/components/ui/button';
+import { Plus } from 'lucide-react';
 
 interface RoutinesSidebarContextType {
   isOpen: boolean;
@@ -43,13 +46,41 @@ function RoutinesSidebarWorkoutsList({ workouts }: { workouts: WorkoutToAdd[] })
   );
 }
 
+function AddWorkoutsButton() {
+  const { toggleWorkoutsSidebar } = useSidebar();
+
+  const onAddWorkouts = () => {
+    toggleWorkoutsSidebar({ isOpen: true, kind: SidebarKinds.select });
+  };
+
+  return (
+    <div className="space-y-4">
+      <Label className="text-black font-medium">Workouts</Label>
+      <div className="border border-gray-300 rounded-md p-4 bg-gray-50">
+        <div className="text-center py-8">
+          <p className="text-gray-600 mb-4">Add workouts to your routine after creating it</p>
+          <Button
+            type="button"
+            variant="outline"
+            className="border-black text-black hover:bg-gray-100"
+            onClick={onAddWorkouts}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Workouts
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RoutinesSidebarCreate() {
-  const { toggleRoutineSidebar } = useSidebar();
   const { isOpen } = useRoutinesSidebar();
   const { workoutToAdd } = useRoutinesStore();
+  const { toggleRoutinesSidebar } = useSidebar();
 
   const onOpenChange = (isOpen: boolean) => {
-    toggleRoutineSidebar({ isOpen, kind: SidebarKinds.create });
+    toggleRoutinesSidebar({ isOpen, kind: SidebarKinds.create });
   };
 
   const onSubmitFormAction = async (data: CreateRoutineFormValues) => {
@@ -57,7 +88,7 @@ function RoutinesSidebarCreate() {
     if (error) {
       throw new Error(error.message || 'Failed to create routine');
     }
-    toggleRoutineSidebar({ isOpen: false, kind: SidebarKinds.create });
+    toggleRoutinesSidebar({ isOpen: false, kind: SidebarKinds.create });
   };
 
   return (
@@ -66,8 +97,12 @@ function RoutinesSidebarCreate() {
         <SheetHeader>
           <SheetTitle className="text-black">Create New Routine</SheetTitle>
         </SheetHeader>
-        <CreateRoutineForm onSubmitFormAction={onSubmitFormAction} onOpenChange={onOpenChange} />
-        <RoutinesSidebarWorkoutsList workouts={workoutToAdd} />
+        <CreateRoutineForm onSubmitFormAction={onSubmitFormAction} onOpenChange={onOpenChange}>
+          <div className="flex flex-col gap-4">
+            <AddWorkoutsButton />
+            <RoutinesSidebarWorkoutsList workouts={workoutToAdd} />
+          </div>
+        </CreateRoutineForm>
       </SheetContent>
     </Sheet>
   );

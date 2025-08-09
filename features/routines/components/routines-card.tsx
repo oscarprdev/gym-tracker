@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/features/shared/components/ui/dropdown-menu';
-import { useDeleteRoutine } from '../hooks/use-routines';
+import { useDeleteRoutine } from '../hooks/use-delete-routine';
 import type { RoutineRecord } from '@/lib/db/queries/routines';
 
 interface RoutineCardProps {
@@ -30,7 +30,6 @@ export function RoutinesCard({ routine }: RoutineCardProps) {
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-lg font-semibold text-black line-clamp-2">{routine.name}</h3>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-black hover:bg-gray-100">
@@ -49,10 +48,8 @@ export function RoutinesCard({ routine }: RoutineCardProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-
         <div className="space-y-3">
           <div className="text-sm text-gray-600">Created: {routine.createdAt.toLocaleDateString()}</div>
-
           <Button variant="outline" className="w-full border-black text-black hover:bg-gray-100" disabled>
             Add Workouts
           </Button>

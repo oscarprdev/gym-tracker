@@ -1,8 +1,8 @@
 'use server';
 
-import { parseCreateWorkout } from '@/features/routines/validations';
+import { parseCreateWorkout, CreateWorkoutData } from '../validations';
 import { protectedAction, to, toSync } from '@/features/shared/utils';
-import { createWorkout, CreateWorkoutData } from '@/lib/db/queries';
+import { createWorkout } from '@/lib/db/queries';
 import { revalidatePath } from 'next/cache';
 
 export const createWorkoutAction = protectedAction(async (session, input: CreateWorkoutData) => {
@@ -12,7 +12,12 @@ export const createWorkoutAction = protectedAction(async (session, input: Create
     return { error: validationError?.message || 'Invalid data' };
   }
 
-  const [dbError, result] = await to(createWorkout(validatedData));
+  const [dbError, result] = await to(
+    createWorkout({
+      ...validatedData,
+      userId: session.userId,
+    })
+  );
 
   if (dbError || !result) {
     return { error: 'Failed to create workout' };
