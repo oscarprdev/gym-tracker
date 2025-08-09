@@ -6,8 +6,8 @@ import { Button } from '@/features/shared/components/ui/button';
 import { Input } from '@/features/shared/components/ui/input';
 import { Label } from '@/features/shared/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/features/shared/components/ui/form';
-import { useCreateWorkoutForm } from '../hooks/use-create-workout-form';
-import { CreateWorkoutData } from '../validations';
+import { useCreateWorkoutForm } from '../../hooks/use-create-workout-form';
+import { CreateWorkoutData } from '../../validations';
 import { ActionResponse } from '@/features/shared/types';
 
 interface CreateWorkoutFormProps {

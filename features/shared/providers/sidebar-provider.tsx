@@ -1,35 +1,36 @@
 'use client';
 
-import { RoutinesSidebar } from '@/features/routines';
-import { WorkoutsSidebar } from '@/features/workouts/components/workouts-sidebar';
+import { WorkoutsSelectSidebar } from '@/features/workouts/components/workouts-select-sidebar/workouts-select-sidebar';
+import { WorkoutsCreateSidebar } from '@/features/workouts/components/workouts-create-sidebar/workouts-create-sidebar';
 import { RoutineRecord } from '@/lib/db/queries';
 import { createContext, PropsWithChildren, useContext, useState } from 'react';
-import { SidebarKinds, SidebarState } from '../types';
+import { RoutinesCreateSidebar } from '@/features/routines/components/routines-create-sidebar/routines-create-sidebar';
 
 interface SidebarContextProps {
   routines: RoutineRecord[];
   selectedRoutineId?: string;
 }
 
-const defaultSidebarState: SidebarState = {
-  isOpen: false,
-  kind: SidebarKinds.create,
-};
-
 interface SidebarContextType {
   routines: RoutineRecord[];
   selectedRoutineId?: string;
-  toggleRoutinesSidebar: (input: SidebarState) => void;
-  toggleWorkoutsSidebar: (input: SidebarState) => void;
-  // toggleExerciseSidebar: (input: SidebarState) => void;
+  routinesCreateSidebar: { isOpen: boolean };
+  workoutsSelectSidebar: { isOpen: boolean };
+  workoutsCreateSidebar: { isOpen: boolean };
+  toggleRoutinesCreateSidebar: (isOpen: boolean) => void;
+  toggleWorkoutsSelectSidebar: (isOpen: boolean) => void;
+  toggleWorkoutsCreateSidebar: (isOpen: boolean) => void;
 }
 
 export const SidebarContext = createContext<SidebarContextType>({
   routines: [],
   selectedRoutineId: undefined,
-  toggleRoutinesSidebar: () => {},
-  toggleWorkoutsSidebar: () => {},
-  // toggleExerciseSidebar: () => {},
+  routinesCreateSidebar: { isOpen: false },
+  workoutsSelectSidebar: { isOpen: false },
+  workoutsCreateSidebar: { isOpen: false },
+  toggleRoutinesCreateSidebar: () => {},
+  toggleWorkoutsSelectSidebar: () => {},
+  toggleWorkoutsCreateSidebar: () => {},
 });
 
 export const useSidebar = () => {
@@ -41,39 +42,38 @@ export const useSidebar = () => {
 };
 
 export const SidebarProvider = ({ children, routines, selectedRoutineId }: PropsWithChildren<SidebarContextProps>) => {
-  const [routinesSidebarState, setRoutinesSidebarState] = useState<SidebarState>(defaultSidebarState);
-  const [workoutSidebarState, setWorkoutSidebarState] = useState<SidebarState>(defaultSidebarState);
+  const [routinesCreateSidebar, setRoutinesCreateSidebar] = useState({ isOpen: false });
+  const [workoutsSelectSidebar, setWorkoutsSelectSidebar] = useState({ isOpen: false });
+  const [workoutsCreateSidebar, setWorkoutsCreateSidebar] = useState({ isOpen: false });
 
-  //   const [exerciseSidebarState, setExerciseSidebarState] = useState<SidebarState>(defaultSidebarState);
-
-  const toggleRoutinesSidebar = (input: SidebarState) => {
-    setRoutinesSidebarState(input);
+  const toggleRoutinesCreateSidebar = (isOpen: boolean) => {
+    setRoutinesCreateSidebar({ isOpen });
   };
 
-  const toggleWorkoutsSidebar = (input: SidebarState) => {
-    setWorkoutSidebarState(input);
+  const toggleWorkoutsSelectSidebar = (isOpen: boolean) => {
+    setWorkoutsSelectSidebar({ isOpen });
   };
 
-  //   const toggleExerciseSidebar = (input: SidebarState) => {
-  //     setExerciseSidebarState(input);
-  //   };
+  const toggleWorkoutsCreateSidebar = (isOpen: boolean) => {
+    setWorkoutsCreateSidebar({ isOpen });
+  };
 
   return (
     <SidebarContext.Provider
       value={{
         routines,
         selectedRoutineId,
-        toggleRoutinesSidebar,
-        toggleWorkoutsSidebar,
+        routinesCreateSidebar,
+        workoutsSelectSidebar,
+        workoutsCreateSidebar,
+        toggleRoutinesCreateSidebar,
+        toggleWorkoutsSelectSidebar,
+        toggleWorkoutsCreateSidebar,
       }}
     >
-      <RoutinesSidebar isOpen={routinesSidebarState.isOpen}>
-        {routinesSidebarState.kind === SidebarKinds.create && <RoutinesSidebar.Create />}
-      </RoutinesSidebar>
-      <WorkoutsSidebar isOpen={workoutSidebarState.isOpen}>
-        {workoutSidebarState.kind === SidebarKinds.select && <WorkoutsSidebar.Select />}
-        {workoutSidebarState.kind === SidebarKinds.create && <WorkoutsSidebar.Create />}
-      </WorkoutsSidebar>
+      <RoutinesCreateSidebar isOpen={routinesCreateSidebar.isOpen} onOpenChange={toggleRoutinesCreateSidebar} />
+      <WorkoutsSelectSidebar isOpen={workoutsSelectSidebar.isOpen} onOpenChange={toggleWorkoutsSelectSidebar} />
+      <WorkoutsCreateSidebar isOpen={workoutsCreateSidebar.isOpen} onOpenChange={toggleWorkoutsCreateSidebar} />
       {children}
     </SidebarContext.Provider>
   );

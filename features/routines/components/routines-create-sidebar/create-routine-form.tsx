@@ -4,10 +4,9 @@ import React, { PropsWithChildren } from 'react';
 import { Button } from '@/features/shared/components/ui/button';
 import { Input } from '@/features/shared/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/features/shared/components/ui/form';
-import { useCreateRoutineForm } from '../hooks/use-create-routine-form';
-import { CreateRoutineFormValues } from '../validations';
+import { useCreateRoutineForm } from '../../hooks/use-create-routine-form';
+import { CreateRoutineFormValues } from '../../validations';
 import { ActionResponse } from '@/features/shared/types';
-import { useSidebar } from '@/features/shared/providers/sidebar-provider';
 
 interface CreateRoutineFormProps {
   onSubmitFormAction: (data: CreateRoutineFormValues) => Promise<ActionResponse | void>;
@@ -19,7 +18,6 @@ export function CreateRoutineForm({
   onOpenChange,
   children,
 }: PropsWithChildren<CreateRoutineFormProps>) {
-  const {} = useSidebar();
   const { form, onSubmit, isPending } = useCreateRoutineForm({ onSubmitFormAction });
 
   return (

@@ -3,13 +3,12 @@
 import { Plus } from 'lucide-react';
 import { Button } from '@/features/shared/components/ui/button';
 import { useSidebar } from '@/features/shared/providers/sidebar-provider';
-import { SidebarKinds } from '@/features/shared';
 
 export function RoutinesList() {
-  const { toggleRoutinesSidebar, routines } = useSidebar();
+  const { toggleRoutinesCreateSidebar, routines } = useSidebar();
 
   const onCreateRoutine = () => {
-    toggleRoutinesSidebar({ isOpen: true, kind: SidebarKinds.create });
+    toggleRoutinesCreateSidebar(true);
   };
 
   const onRoutineSelect = async (routineId: string) => {
